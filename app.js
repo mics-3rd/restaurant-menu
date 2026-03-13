@@ -36,7 +36,7 @@ fetch("menu.json")
             menuContainer.appendChild(title);
             items.forEach(item => {
                 const div = document.createElement("div");
-                div.className = "menuItem";
+                div.className = "menuCard";
                 div.textContent = item;
                 menuContainer.appendChild(div);
             });
