@@ -10,7 +10,20 @@ h1 {
     color: #333;
 }
 
-/* カテゴリカード */
+h2 {
+    margin-bottom: 5px;
+}
+
+h3 {
+    margin-top: 25px;
+    margin-bottom: 10px;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* カテゴリ */
 #categoryContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -20,19 +33,12 @@ h1 {
 }
 
 .card {
-    background: #ffffff;
+    background: white;
     border: 2px solid #8b7d6b;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.1s;
-}
-
-/* タップ時アニメーション */
-.card:active {
-    transform: scale(0.96);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .icon {
@@ -51,18 +57,13 @@ h1 {
     margin-top: 4px;
 }
 
-/* メニュー画面 */
+/* 料理一覧 */
 #menuContainer {
     display: none;
 }
 
-h2 {
-    margin-bottom: 20px;
-}
-
-/* レシピカード */
 .menuCard {
-    background: #ffffff;
+    background: white;
     border: 1px solid #bfb7a8;
     border-radius: 10px;
     padding: 15px;
@@ -70,9 +71,48 @@ h2 {
     max-width: 320px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-size: 16px;
+    cursor: pointer;
 }
 
-/* 戻るボタン */
+/* 人数 */
+.servings {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+/* 材料 */
+.ingredient {
+    display: flex;
+    justify-content: space-between;
+    background: white;
+    border-left: 4px solid #8b7d6b;
+    padding: 10px;
+    margin: 6px auto;
+    max-width: 400px;
+    border-radius: 6px;
+}
+
+.ingName {
+    text-align: left;
+}
+
+.ingAmount {
+    color: #444;
+}
+
+/* 作り方 */
+.step {
+    background: white;
+    border-left: 4px solid #6b7a6a;
+    padding: 10px;
+    margin: 6px auto;
+    max-width: 400px;
+    text-align: left;
+    border-radius: 6px;
+}
+
+/* 戻る */
 #backBtn {
     display: none;
     margin-top: 20px;
@@ -83,8 +123,4 @@ h2 {
     color: white;
     font-size: 14px;
     cursor: pointer;
-}
-
-#backBtn:active {
-    transform: scale(0.95);
 }
