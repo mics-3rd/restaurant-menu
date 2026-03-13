@@ -15,8 +15,12 @@ fetch("menu.json")
             const title = document.createElement("div");
             title.className = "title";
             title.textContent = category;
+            const count = document.createElement("div");
+            count.className = "count";
+            count.textContent = menu[category].items.length + "品";
             card.appendChild(icon);
             card.appendChild(title);
+            card.appendChild(count);
             card.onclick = () => {
                 showMenu(category, menu[category].items);
             };

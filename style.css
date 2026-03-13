@@ -17,9 +17,9 @@ h1 {
 
 #categoryContainer {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    max-width: 400px;
+    max-width: 500px;
     margin: auto;
 }
 
@@ -35,6 +35,12 @@ h1 {
 
 .card:hover {
     transform: scale(1.03);
+}
+
+.count {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
 }
 
 .icon {
