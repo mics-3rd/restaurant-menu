@@ -2,10 +2,17 @@ body {
     font-family: sans-serif;
     margin: 20px;
     text-align: center;
+    background-image: url("wood.jpg");
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 h1 {
     margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.8);
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 10px;
 }
 
 #categoryContainer {
@@ -17,11 +24,17 @@ h1 {
 }
 
 .card {
-    background: white;
+    background: #fffaf0;
     border-radius: 15px;
     padding: 25px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 3px solid #8B5A2B;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     cursor: pointer;
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.03);
 }
 
 .icon {
