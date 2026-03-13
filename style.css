@@ -2,74 +2,75 @@ body {
     font-family: sans-serif;
     margin: 20px;
     text-align: center;
-    background-image: url("wood.jpg");
-    background-size: cover;
-    background-attachment: fixed;
+    background: #e8e4dc;
 }
 
 h1 {
     margin-bottom: 30px;
-    background: rgba(255, 255, 255, 0.8);
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 10px;
+    color: #333;
 }
 
+/* カテゴリカード */
 #categoryContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    max-width: 500px;
+    max-width: 400px;
     margin: auto;
 }
 
 .card {
-    background: #fffaf0;
-    border-radius: 15px;
-    padding: 25px;
-    border: 3px solid #8B5A2B;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    background: #ffffff;
+    border: 2px solid #8b7d6b;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     cursor: pointer;
-    transition: 0.2s;
-}
-
-.card:hover {
-    transform: scale(1.03);
-}
-
-.count {
-    font-size: 14px;
-    color: #666;
-    margin-top: 5px;
 }
 
 .icon {
-    font-size: 40px;
+    font-size: 36px;
 }
 
 .title {
-    font-size: 20px;
-    margin-top: 10px;
+    font-size: 18px;
+    margin-top: 8px;
+    font-weight: bold;
 }
 
-.menuItem {
-    background: #f5f5f5;
-    margin: 10px auto;
-    padding: 15px;
-    border-radius: 10px;
-    max-width: 300px;
+.count {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
 }
 
+/* メニュー表示 */
 #menuContainer {
     display: none;
 }
 
+h2 {
+    margin-bottom: 20px;
+}
+
+.menuItem {
+    background: #ffffff;
+    border: 1px solid #bfb7a8;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px auto;
+    max-width: 300px;
+}
+
+/* 戻るボタン */
 #backBtn {
+    display: none;
     margin-top: 20px;
     padding: 10px 20px;
-    border-radius: 8px;
     border: none;
-    background: #4CAF50;
+    border-radius: 8px;
+    background: #6b7a6a;
     color: white;
+    font-size: 14px;
     cursor: pointer;
 }
