@@ -1,18 +1,19 @@
-const params = new URLSearchParams(location.search)
-const category = params.get("category")
-fetch("data/menu.json")
-    .then(r => r.json())
-    .then(data => {
-        const menus = data.menus
-            .filter(m => m.category === category)
-            .sort((a, b) => a.name.localeCompare(b.name, "ja"))
-        const list = document.getElementById("menuList")
-        menus.forEach(m => {
-            const li = document.createElement("li")
-            li.textContent = m.name
-            li.onclick = () => {
-                location.href = "recipe.html?id=" + m.id
+async function init() {
+    const params = new URLSearchParams(location.search)
+    const id = params.get("id")
+    const res = await fetch("data/menus/index.json")
+    const menus = (await res.json()).menus
+    const list = document.getElementById("menuList")
+    menus
+        .filter(m => m.category === id)
+        .forEach(menu => {
+            const row = document.createElement("div")
+            row.className = "menu-item"
+            row.innerHTML = `<span>${menu.name}</span><span>›</span>`
+            row.onclick = () => {
+                location.href = `recipe.html?id=${menu.id}`
             }
-            list.appendChild(li)
+            list.appendChild(row)
         })
-    })
+}
+init()

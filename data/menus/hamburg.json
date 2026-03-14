@@ -1,27 +1,23 @@
 {
-    "categories": [
-        {
-            "id": "meat",
-            "name": "肉料理",
-            "icon": "🍖"
-        },
-        {
-            "id": "fish",
-            "name": "魚料理",
-            "icon": "🐟"
-        },
-        {
-            "id": "soup",
-            "name": "スープ",
-            "icon": "🍲"
-        }
-    ],
-    "menus": [
-        {
-            "id": "hamburg",
-            "name": "ハンバーグ",
-            "category": "meat",
-            "recipe": null
-        }
-    ]
+    "id": "hamburg",
+    "name": "ハンバーグ",
+    "category": "meat",
+    "recipe": {
+        "servings": "2人分",
+        "ingredients": [
+            {
+                "name": "合い挽き肉",
+                "amount": "300g"
+            },
+            {
+                "name": "玉ねぎ",
+                "amount": "1/2個"
+            }
+        ],
+        "steps": [
+            "玉ねぎを炒める",
+            "肉と混ぜる",
+            "焼く"
+        ]
+    }
 }

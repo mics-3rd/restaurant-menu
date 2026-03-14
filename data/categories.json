@@ -3,25 +3,20 @@
         {
             "id": "meat",
             "name": "肉料理",
-            "icon": "🍖"
+            "icon": "🍖",
+            "order": 1
         },
         {
             "id": "fish",
             "name": "魚料理",
-            "icon": "🐟"
+            "icon": "🐟",
+            "order": 2
         },
         {
             "id": "soup",
             "name": "スープ",
-            "icon": "🍲"
-        }
-    ],
-    "menus": [
-        {
-            "id": "hamburg",
-            "name": "ハンバーグ",
-            "category": "meat",
-            "recipe": null
+            "icon": "🍲",
+            "order": 3
         }
     ]
 }
