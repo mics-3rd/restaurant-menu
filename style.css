@@ -1,126 +1,59 @@
 body {
     font-family: sans-serif;
-    margin: 20px;
     text-align: center;
-    background: #e8e4dc;
+    background: #f2f2f2;
+    margin: 0;
+    padding: 20px;
 }
 
-h1 {
-    margin-bottom: 30px;
-    color: #333;
-}
-
-h2 {
-    margin-bottom: 5px;
-}
-
-h3 {
-    margin-top: 25px;
-    margin-bottom: 10px;
-    text-align: left;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* カテゴリ */
 #categoryContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    max-width: 400px;
+    max-width: 500px;
     margin: auto;
 }
 
 .card {
     background: white;
-    border: 2px solid #8b7d6b;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
 
 .icon {
-    font-size: 36px;
+    font-size: 32px;
+    margin-bottom: 5px;
 }
 
-.title {
-    font-size: 18px;
-    margin-top: 8px;
-    font-weight: bold;
+ul {
+    list-style: none;
+    padding: 0;
 }
 
-.count {
-    font-size: 13px;
-    color: #666;
-    margin-top: 4px;
-}
-
-/* 料理一覧 */
-#menuContainer {
-    display: none;
-}
-
-.menuCard {
+li {
     background: white;
-    border: 1px solid #bfb7a8;
-    border-radius: 10px;
-    padding: 15px;
     margin: 10px auto;
-    max-width: 320px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    max-width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+input,
+textarea {
+    width: 90%;
+    max-width: 400px;
+    margin: 10px;
+    padding: 10px;
     font-size: 16px;
-    cursor: pointer;
 }
 
-/* 人数 */
-.servings {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 10px;
-}
-
-/* 材料 */
-.ingredient {
-    display: flex;
-    justify-content: space-between;
-    background: white;
-    border-left: 4px solid #8b7d6b;
-    padding: 10px;
-    margin: 6px auto;
-    max-width: 400px;
-    border-radius: 6px;
-}
-
-.ingName {
-    text-align: left;
-}
-
-.ingAmount {
-    color: #444;
-}
-
-/* 作り方 */
-.step {
-    background: white;
-    border-left: 4px solid #6b7a6a;
-    padding: 10px;
-    margin: 6px auto;
-    max-width: 400px;
-    text-align: left;
-    border-radius: 6px;
-}
-
-/* 戻る */
-#backBtn {
-    display: none;
-    margin-top: 20px;
+button {
     padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background: #6b7a6a;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
 }
