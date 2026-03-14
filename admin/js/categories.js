@@ -1,20 +1,20 @@
-fetch("data/menu.json")
-    .then(r => r.json())
-    .then(data => {
-        const list = document.getElementById("list")
-        data.categories.forEach(c => {
-            const li = document.createElement("li")
-            li.textContent = c.name
-            list.appendChild(li)
+async function addCategory() {
+    const name = document.getElementById("name").value
+    const id = document.getElementById("id").value
+    const body = `
+category追加
+id:${id}
+name:${name}
+`
+    await fetch(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/issues`, {
+        method: "POST",
+        headers: {
+            "Accept": "application/vnd.github+json"
+        },
+        body: JSON.stringify({
+            title: `category:${name}`,
+            body: body
         })
     })
-
-function addCategory() {
-    const name = document.getElementById("newCategory").value
-    const body = `type:category
-name:${name}`
-    const url =
-        "https://github.com/YOUR_USERNAME/YOUR_REPO/issues/new?title=category"
-        + "&body=" + encodeURIComponent(body)
-    window.open(url)
+    alert("追加リクエスト送信しました")
 }

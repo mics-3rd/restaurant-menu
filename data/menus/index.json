@@ -3,11 +3,13 @@
         {
             "id": "hamburg",
             "name": "ハンバーグ",
+            "description": "ジューシーな定番洋食メニュー",
             "category": "meat"
         },
         {
             "id": "miso",
             "name": "味噌汁",
+            "description": "毎日の定番スープ",
             "category": "soup"
         }
     ]

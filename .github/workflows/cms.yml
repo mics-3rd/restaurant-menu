@@ -1,28 +1,23 @@
-name: update menu
-
+name: menu-cms
 on:
-  issues:
-    types: [opened]
-
+ issues:
+   types: [opened]
 jobs:
-
-  update:
-
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - run: node scripts/update-menu.js
-
-      - run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "update menu"
-          git push
+ update:
+   runs-on: ubuntu-latest
+   permissions:
+     contents: write
+     issues: read
+   steps:
+     - uses: actions/checkout@v4
+     - name: parse issue
+       run: |
+         echo "${{ github.event.issue.title }}" > title.txt
+         echo "${{ github.event.issue.body }}" > body.txt
+     - name: commit
+       run: |
+         git config user.name "cms-bot"
+         git config user.email "bot@github"
+         git add .
+         git commit -m "CMS update"
+         git push

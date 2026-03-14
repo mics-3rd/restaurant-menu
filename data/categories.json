@@ -1,22 +1,14 @@
-{
-    "categories": [
-        {
-            "id": "meat",
-            "name": "肉料理",
-            "icon": "🍖",
-            "order": 1
-        },
-        {
-            "id": "fish",
-            "name": "魚料理",
-            "icon": "🐟",
-            "order": 2
-        },
-        {
-            "id": "soup",
-            "name": "スープ",
-            "icon": "🍲",
-            "order": 3
-        }
-    ]
-}
+[
+    {
+        "id": "meat",
+        "name": "肉料理"
+    },
+    {
+        "id": "fish",
+        "name": "魚料理"
+    },
+    {
+        "id": "soup",
+        "name": "スープ"
+    }
+]

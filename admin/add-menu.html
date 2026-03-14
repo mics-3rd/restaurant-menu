@@ -10,11 +10,13 @@
 <body>
     <header>メニュー追加</header>
     <div class="container">
-        <input id="name" placeholder="料理名">
+        <input id="name" placeholder="メニュー名">
+        <textarea id="description" placeholder="説明"></textarea>
         <select id="category"></select>
-        <button onclick="submitMenu()">追加</button>
+        <button onclick="addMenu()">登録</button>
     </div>
-    <script src="../js/admin-add-menu.js"></script>
+    <script src="../config.js"></script>
+    <script src="js/add-menu.js"></script>
 </body>
 
 </html>

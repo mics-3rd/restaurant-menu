@@ -3,23 +3,28 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>メニュー</title>
-    <link rel="stylesheet" href="style.css">
+    <title>管理メニュー</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
-    <header>メニュー</header>
+    <header>管理メニュー</header>
     <div class="container">
-        <div class="search">
-            <input id="searchInput" placeholder="メニュー検索">
+        <div class="menu-list">
+            <div class="menu-card" onclick="location.href='add-menu.html'">
+                メニュー追加
+            </div>
+            <div class="menu-card" onclick="location.href='add-recipe.html'">
+                レシピ追加
+            </div>
+            <div class="menu-card" onclick="location.href='categories.html'">
+                カテゴリ管理
+            </div>
+            <div class="menu-card" onclick="location.href='edit-menu.html'">
+                メニュー編集
+            </div>
         </div>
-        <div id="searchResult"></div>
-        <div id="categoryCards" class="cards"></div>
-        <a href="admin/add-menu.html">
-            <button>＋メニュー追加</button>
-        </a>
     </div>
-    <script src="js/app.js"></script>
 </body>
 
 </html>
