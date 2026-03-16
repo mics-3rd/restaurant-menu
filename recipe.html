@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex,nofollow">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
   <title>料理メニュー - レシピ</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 <header>
@@ -35,18 +35,29 @@
 
     if (!menu) {
       heading.textContent = "レシピが見つかりません";
-      content.innerHTML = '<p class="empty">メニューが見つかりません。トップに戻ってください。</p>';
+      content.innerHTML = "<p class='empty'>メニューが見つかりません。トップに戻ってください。</p>";
       return;
     }
+
     heading.textContent = menu.name;
-    const recipeHtml = `
-      <p class="menu-card-description">${menu.description || "説明なし"}</p>
-      <h2>作り方</h2>
-      <ol>
-        ${(menu.recipe || []).map(step => `<li>${step}</li>`).join("")}
-      </ol>
+    const ingredientsHtml = (menu.ingredients || []).map(i => `<li>${i}</li>`).join("");
+    const recipeHtml = (menu.recipe || []).map(step => `<li>${step}</li>`).join("");
+
+    content.innerHTML = `
+      <section class="box">
+        <h2>説明</h2>
+        <p class="menu-card-description">${menu.description || "説明なし"}</p>
+      </section>
+      <section class="box">
+        <h2>材料</h2>
+        <p><strong>分量：</strong>${menu.serving || "不明"}</p>
+        <ul>${ingredientsHtml || "<li>材料が登録されていません。</li>"}</ul>
+      </section>
+      <section class="box">
+        <h2>作り方</h2>
+        <ol>${recipeHtml || "<li>手順が登録されていません。</li>"}</ol>
+      </section>
     `;
-    content.innerHTML = recipeHtml;
   }
 
   document.getElementById("backBtn").addEventListener("click", () => {
