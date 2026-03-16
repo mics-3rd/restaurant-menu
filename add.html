@@ -79,7 +79,6 @@ document.getElementById("addForm").addEventListener("submit", async (e) => {
     const resp = await fetch(DATA_API_URL, {
       method: "POST",
       mode: "cors",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
@@ -89,10 +88,11 @@ document.getElementById("addForm").addEventListener("submit", async (e) => {
     if (json.ok) {
       status.style.color = "#2f5d2f";
       status.textContent = "追加が完了しました。";
-      setTimeout(() => location.href=`category.html?cat=${encodeURIComponent(payload.category)}`, 800);
-      return;
+      setTimeout(() => location.href = `category.html?cat=${encodeURIComponent(payload.category)}`, 800);
+    } else {
+      status.style.color = "#8b2b2b";
+      status.textContent = "追加に失敗しました： " + (json.message || "サーバエラー");
     }
-    throw new Error(json.message || "サーバエラー");
   } catch (err) {
     status.style.color = "#8b2b2b";
     status.textContent = "追加に失敗しました： " + err.message;
