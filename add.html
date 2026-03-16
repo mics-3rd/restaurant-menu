@@ -27,6 +27,7 @@
       <button type="submit" class="back-btn">追加</button>
       <button type="button" id="cancel" class="back-btn">キャンセル</button>
     </form>
+    <p id="statusMessage" style="margin-top:.8rem;color:#5f3f2d;"></p>
   </section>
 </main>
 <footer class="footer">
@@ -45,8 +46,10 @@ async function init() {
   });
 }
 
-document.getElementById("addForm").addEventListener("submit", async e => {
+document.getElementById("addForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const status = document.getElementById("statusMessage");
+  status.textContent = "送信中...";
   const payload = {
     id: `custom-${Date.now()}`,
     category: document.getElementById("category").value,
@@ -57,21 +60,32 @@ document.getElementById("addForm").addEventListener("submit", async e => {
     recipe: document.getElementById("recipe").value.split("\n").map(s => s.trim()).filter(Boolean)
   };
 
-  const resp = await fetch(DATA_API_URL, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
-  });
-  const j = await resp.json();
-  if (j.ok) {
-    alert("追加しました");
-    location.href = `category.html?cat=${encodeURIComponent(payload.category)}`;
-  } else {
-    alert("追加に失敗しました：" + (j.message || ""));
+  try {
+    const resp = await fetch(DATA_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const json = await resp.json();
+    if (json.ok) {
+      status.style.color = "#2f5d2f";
+      status.textContent = "追加が完了しました。";
+      setTimeout(() => {
+        location.href = `category.html?cat=${encodeURIComponent(payload.category)}`;
+      }, 800);
+    } else {
+      status.style.color = "#8b2b2b";
+      status.textContent = "追加に失敗しました: " + (json.message || "Unknown");
+    }
+  } catch (err) {
+    status.style.color = "#8b2b2b";
+    status.textContent = "通信エラー: " + err.message;
   }
 });
 
-document.getElementById("cancel").addEventListener("click", () => location.href = "index.html");
+document.getElementById("cancel").addEventListener("click", () => {
+  location.href = "index.html";
+});
 
 init().catch(console.error);
 </script>
