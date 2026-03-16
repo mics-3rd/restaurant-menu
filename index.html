@@ -1,94 +1,44 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex,nofollow" />
-  <title>料理メニュー一覧</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>料理メニュー - カテゴリ</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1>料理メニュー一覧</h1>
-    <p>サーバ/DB不要・静的サイト</p>
-  </header>
-
-  <main>
-    <section id="page-categories">
-      <h2>カテゴリ</h2>
-      <div id="categoryGrid" class="grid"></div>
-    </section>
-
-    <section id="page-menu" class="hidden">
-      <button id="backBtn" class="back-btn">← 戻る</button>
-      <h2 id="menuTitle"></h2>
-      <ul id="menuList" class="menu-list"></ul>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <small>© 2026 料理メニューサイト</small>
-  </footer>
-
-  <script>
-    const menus = [
-      { name: "ビーフステーキ", category: "肉料理", price: 1200 },
-      { name: "豚の生姜焼き", category: "肉料理", price: 980 },
-      { name: "サーモンの塩焼き", category: "魚料理", price: 1040 },
-      { name: "アジフライ", category: "魚料理", price: 890 },
-      { name: "コーンスープ", category: "スープ", price: 550 },
-      { name: "ミネストローネ", category: "スープ", price: 620 },
-      { name: "野菜サラダ", category: "サラダ", price: 600 },
-      { name: "シーザーサラダ", category: "サラダ", price: 680 }
-    ];
-
-    const pageCategories = document.getElementById("page-categories");
-    const pageMenu = document.getElementById("page-menu");
-    const categoryGrid = document.getElementById("categoryGrid");
-    const menuList = document.getElementById("menuList");
-    const menuTitle = document.getElementById("menuTitle");
-    const backBtn = document.getElementById("backBtn");
-
-    const categories = [...new Set(menus.map(item => item.category))];
-
-    function showPage(pageId) {
-      pageCategories.classList.toggle("hidden", pageId !== "categories");
-      pageMenu.classList.toggle("hidden", pageId !== "menu");
-    }
-
-    function renderCategories() {
-      categoryGrid.innerHTML = "";
-      categories.forEach(category => {
-        const card = document.createElement("button");
-        card.className = "card";
-        card.type = "button";
-        card.textContent = category;
-        card.addEventListener("click", () => openCategory(category));
-        categoryGrid.appendChild(card);
+<header>
+  <h1>料理メニューカテゴリ</h1>
+  <p>カテゴリを選択してメニューを見る</p>
+</header>
+<main>
+  <section>
+    <div id="categoryGrid" class="grid"></div>
+  </section>
+</main>
+<footer class="footer">
+  <small>© 2026 料理メニューサイト</small>
+</footer>
+<script>
+  async function loadData() {
+    const res = await fetch("data/menus.json");
+    const json = await res.json();
+    const grid = document.getElementById("categoryGrid");
+    json.categories.forEach(category => {
+      const btn = document.createElement("button");
+      btn.className = "card";
+      btn.type = "button";
+      btn.textContent = category.name;
+      btn.addEventListener("click", () => {
+        const u = new URL("category.html", location.href);
+        u.searchParams.set("cat", category.id);
+        location.href = u.toString();
       });
-    }
-
-    function openCategory(category) {
-      const filtered = menus.filter(item => item.category === category);
-      menuTitle.textContent = `${category} のメニュー (${filtered.length})`;
-      menuList.innerHTML = "";
-      if (filtered.length === 0) {
-        menuList.innerHTML = "<li class='empty'>メニューがありません</li>";
-      } else {
-        filtered.forEach(item => {
-          const li = document.createElement("li");
-          li.className = "menu-item";
-          li.innerHTML = `<strong>${item.name}</strong><span class="price">${item.price}円</span>`;
-          menuList.appendChild(li);
-        });
-      }
-      showPage("menu");
-    }
-
-    backBtn.addEventListener("click", () => showPage("categories"));
-
-    renderCategories();
-    showPage("categories");
-  </script>
+      grid.appendChild(btn);
+    });
+  }
+  loadData().catch(console.error);
+</script>
 </body>
 </html>

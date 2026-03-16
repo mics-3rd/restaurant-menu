@@ -1,0 +1,18 @@
+{
+  "categories": [
+    { "id": "meat", "name": "肉料理" },
+    { "id": "fish", "name": "魚料理" },
+    { "id": "soup", "name": "スープ" },
+    { "id": "salad", "name": "サラダ" }
+  ],
+  "menus": [
+    { "name": "ビーフステーキ", "category": "meat", "price": 1200 },
+    { "name": "豚の生姜焼き", "category": "meat", "price": 980 },
+    { "name": "サーモンの塩焼き", "category": "fish", "price": 1040 },
+    { "name": "アジフライ", "category": "fish", "price": 890 },
+    { "name": "コーンスープ", "category": "soup", "price": 550 },
+    { "name": "ミネストローネ", "category": "soup", "price": 620 },
+    { "name": "野菜サラダ", "category": "salad", "price": 600 },
+    { "name": "シーザーサラダ", "category": "salad", "price": 680 }
+  ]
+}
