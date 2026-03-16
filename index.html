@@ -14,16 +14,15 @@
   </header>
 
   <main>
-    <section class="menu-section">
-      <h2>メニュー</h2>
-      <ul id="menuList" class="menu-list">
-        <!-- JavaScript でメニューを追加 -->
-      </ul>
+    <section id="page-categories">
+      <h2>カテゴリ</h2>
+      <div id="categoryGrid" class="grid"></div>
     </section>
 
-    <section class="filter-section">
-      <h2>絞り込み</h2>
-      <input id="searchInput" type="search" placeholder="料理名で検索" />
+    <section id="page-menu" class="hidden">
+      <button id="backBtn" class="back-btn">← 戻る</button>
+      <h2 id="menuTitle"></h2>
+      <ul id="menuList" class="menu-list"></ul>
     </section>
   </main>
 
@@ -33,38 +32,63 @@
 
   <script>
     const menus = [
-      { name: "カレーライス", category: "和食", price: 850 },
-      { name: "ハンバーグ定食", category: "洋食", price: 980 },
-      { name: "親子丼", category: "和食", price: 780 },
-      { name: "パスタ", category: "イタリアン", price: 860 },
-      { name: "サラダプレート", category: "サラダ", price: 650 }
+      { name: "ビーフステーキ", category: "肉料理", price: 1200 },
+      { name: "豚の生姜焼き", category: "肉料理", price: 980 },
+      { name: "サーモンの塩焼き", category: "魚料理", price: 1040 },
+      { name: "アジフライ", category: "魚料理", price: 890 },
+      { name: "コーンスープ", category: "スープ", price: 550 },
+      { name: "ミネストローネ", category: "スープ", price: 620 },
+      { name: "野菜サラダ", category: "サラダ", price: 600 },
+      { name: "シーザーサラダ", category: "サラダ", price: 680 }
     ];
 
+    const pageCategories = document.getElementById("page-categories");
+    const pageMenu = document.getElementById("page-menu");
+    const categoryGrid = document.getElementById("categoryGrid");
     const menuList = document.getElementById("menuList");
-    const searchInput = document.getElementById("searchInput");
+    const menuTitle = document.getElementById("menuTitle");
+    const backBtn = document.getElementById("backBtn");
 
-    function renderMenu(filter = "") {
-      const kw = filter.trim().toLowerCase();
-      menuList.innerHTML = "";
-      const filtered = menus.filter(item => item.name.toLowerCase().includes(kw));
-      if (filtered.length === 0) {
-        menuList.innerHTML = "<li class=\"empty\">対象のメニューがありません</li>";
-        return;
-      }
-      filtered.forEach(item => {
-        const li = document.createElement("li");
-        li.className = "menu-item";
-        li.innerHTML = `
-          <strong>${item.name}</strong>
-          <span class="category">${item.category}</span>
-          <span class="price">${item.price}円</span>
-        `;
-        menuList.appendChild(li);
+    const categories = [...new Set(menus.map(item => item.category))];
+
+    function showPage(pageId) {
+      pageCategories.classList.toggle("hidden", pageId !== "categories");
+      pageMenu.classList.toggle("hidden", pageId !== "menu");
+    }
+
+    function renderCategories() {
+      categoryGrid.innerHTML = "";
+      categories.forEach(category => {
+        const card = document.createElement("button");
+        card.className = "card";
+        card.type = "button";
+        card.textContent = category;
+        card.addEventListener("click", () => openCategory(category));
+        categoryGrid.appendChild(card);
       });
     }
 
-    searchInput.addEventListener("input", () => renderMenu(searchInput.value));
-    renderMenu();
+    function openCategory(category) {
+      const filtered = menus.filter(item => item.category === category);
+      menuTitle.textContent = `${category} のメニュー (${filtered.length})`;
+      menuList.innerHTML = "";
+      if (filtered.length === 0) {
+        menuList.innerHTML = "<li class='empty'>メニューがありません</li>";
+      } else {
+        filtered.forEach(item => {
+          const li = document.createElement("li");
+          li.className = "menu-item";
+          li.innerHTML = `<strong>${item.name}</strong><span class="price">${item.price}円</span>`;
+          menuList.appendChild(li);
+        });
+      }
+      showPage("menu");
+    }
+
+    backBtn.addEventListener("click", () => showPage("categories"));
+
+    renderCategories();
+    showPage("categories");
   </script>
 </body>
 </html>
