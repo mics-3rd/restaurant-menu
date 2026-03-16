@@ -24,8 +24,9 @@
 function getQuery(name) { return new URLSearchParams(location.search).get(name); }
 
 async function fetchMenus() {
-  const j = await fetch("data/menus.json").then(r => r.json());
-  return j.menus || [];
+  const json = await fetch("data/menus.json").then(r => r.json());
+  const custom = JSON.parse(localStorage.getItem("customMenus") || "[]");
+  return [...(json.menus || []), ...custom];
 }
 
 async function loadRecipe() {
@@ -37,28 +38,25 @@ async function loadRecipe() {
 
   if (!menu) {
     heading.textContent = "レシピが見つかりません";
-    content.innerHTML = '<p class="empty">対象メニューが見つかりません。</p>';
+    content.innerHTML = '<p class="empty">メニューが見つかりません。</p>';
     return;
   }
 
   heading.textContent = menu.name;
-  const ingredientsHtml = (menu.ingredients || []).map(i => {
-    if (typeof i === "object") {
-      return `<div class="ingredient-row"><div class="ingredient-name">${i.item}</div><div class="ingredient-amount">${i.amount||""}</div></div>`;
-    }
+  const ingredients = (menu.ingredients || []).map(i => {
+    if (typeof i === "object") return `<div class="ingredient-row"><div class="ingredient-name">${i.item}</div><div class="ingredient-amount">${i.amount||""}</div></div>`;
     const [item, amount] = i.split(/\s+(.+)/);
-    return `<div class="ingredient-row"><div class="ingredient-name">${item}</div><div class="ingredient-amount">${amount || ""}</div></div>`;
+    return `<div class="ingredient-row"><div class="ingredient-name">${item}</div><div class="ingredient-amount">${amount||""}</div></div>`;
   }).join("");
-  const recipeHtml = (menu.recipe || []).map(step => `<li>${step}</li>`).join("");
+  const recipe = (menu.recipe || []).map(step => `<li>${step}</li>`).join("");
 
   content.innerHTML = `
     <section class="box"><h2>説明</h2><p class="menu-card-description">${menu.description || "説明なし"}</p></section>
-    <section class="box"><h2>材料</h2><p><strong>分量：</strong>${menu.serving || "不明"}</p><div class="ingredient-list">${ingredientsHtml || "<p>材料が登録されていません</p>"}</div></section>
-    <section class="box"><h2>作り方</h2><ol>${recipeHtml || "<li>手順が登録されていません</li>"}</ol></section>
-  `;
+    <section class="box"><h2>材料</h2><p><strong>分量：</strong>${menu.serving || "不明"}</p><div class="ingredient-list">${ingredients || "<p>材料が登録されていません</p>"}</div></section>
+    <section class="box"><h2>作り方</h2><ol>${recipe || "<li>手順が登録されていません</li>"}</ol></section>`;
 }
 
-document.getElementById("backBtn").addEventListener("click", () => {
+document.getElementById("backBtn").addEventListener("click", ()=> {
   const cat = getQuery("cat");
   location.href = cat ? `category.html?cat=${encodeURIComponent(cat)}` : "index.html";
 });

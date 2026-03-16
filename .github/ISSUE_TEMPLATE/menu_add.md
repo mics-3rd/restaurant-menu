@@ -1,10 +1,10 @@
 name: メニュー追加
 about: 料理メニューを追加する
-title: "【追加】<メニュー名>"
+title: "【追加】"
 labels: add-menu
 assignees: ''
 
-## カテゴリ (1つ選択)
+## カテゴリ
 - [ ] meat
 - [ ] fish
 - [ ] soup

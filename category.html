@@ -26,14 +26,15 @@ function getQuery(name) {
 }
 
 async function fetchMenus() {
-  const j = await fetch("data/menus.json").then(r => r.json());
-  return j.menus || [];
+  const json = await fetch("data/menus.json").then(r => r.json());
+  const custom = JSON.parse(localStorage.getItem("customMenus") || "[]");
+  return [...(json.menus || []), ...custom];
 }
 
 async function loadMenu() {
   const catId = getQuery("cat");
-  const data = await fetch("data/menus.json").then(r=>r.json());
-  const cat = (data.categories||[]).find(c => c.id === catId);
+  const json = await fetch("data/menus.json").then(r => r.json());
+  const cat = (json.categories || []).find(c => c.id === catId);
   const heading = document.getElementById("heading");
   const list = document.getElementById("menuList");
 
@@ -42,8 +43,8 @@ async function loadMenu() {
     list.innerHTML = '<li class="empty">カテゴリが見つかりません。</li>';
     return;
   }
-
   heading.textContent = `${cat.name} のメニュー`;
+
   const items = (await fetchMenus()).filter(m => m.category === catId);
   if (!items.length) {
     list.innerHTML = '<li class="empty">メニューがありません。</li>';
