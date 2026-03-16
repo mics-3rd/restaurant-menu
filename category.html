@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex,nofollow">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
   <title>料理メニュー - 一覧</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="config.js"></script>
 </head>
 <body>
 <header>
@@ -18,68 +19,64 @@
 <footer class="footer">
   <small>© 2026 料理メニューサイト</small>
 </footer>
+
 <script>
-  function getQuery(name) {
-    return new URLSearchParams(location.search).get(name);
+function getQuery(name) {
+  return new URLSearchParams(location.search).get(name);
+}
+
+async function fetchMenus() {
+  try {
+    const r = await fetch(DATA_API_URL);
+    if (!r.ok) throw new Error("api");
+    const j = await r.json();
+    if (j && Array.isArray(j.menus)) return j.menus;
+  } catch {}
+  const r = await fetch("data/menus.json");
+  const j = await r.json();
+  return j.menus || [];
+}
+
+async function loadMenu() {
+  const catId = getQuery("cat");
+  const menus = await fetchMenus();
+  const categoriesData = (await (await fetch("data/menus.json")).json()).categories || [];
+  const cat = categoriesData.find(item => item.id === catId);
+  const heading = document.getElementById("heading");
+  const list = document.getElementById("menuList");
+
+  if (!cat) {
+    heading.textContent = "不明なカテゴリ";
+    list.innerHTML = '<li class="empty">カテゴリ情報が見つかりません。</li>';
+    return;
   }
 
-  async function fetchMenus() {
-    try {
-      const r = await fetch(DATA_API_URL);
-      if (!r.ok) throw new Error("API error");
-      const j = await r.json();
-      return j.menus || [];
-    } catch {
-      const r = await fetch("data/menus.json");
-      const j = await r.json();
-      return j.menus || [];
-    }
+  heading.textContent = `${cat.name} のメニュー`;
+  const items = menus.filter(m => m.category === catId);
+  if (items.length === 0) {
+    list.innerHTML = '<li class="empty">メニューがありません。</li>';
+    return;
   }
 
-  async function loadMenu() {
-    const catId = getQuery("cat");
-    const res = await fetch("data/menus.json");
-    const json = await res.json();
-    const cat = json.categories.find(c => c.id === catId);
-    const heading = document.getElementById("heading");
-    const list = document.getElementById("menuList");
-
-    if (!cat) {
-      heading.textContent = "不明なカテゴリ";
-      list.innerHTML = '<li class="empty">カテゴリ情報が見つかりません。</li>';
-      return;
-    }
-
-    heading.textContent = `${cat.name} のメニュー`;
-    const items = json.menus.filter(m => m.category === catId);
-    if (items.length === 0) {
-      list.innerHTML = '<li class="empty">メニューがありません。</li>';
-      return;
-    }
-
-    list.innerHTML = "";
-    items.forEach(item => {
-      const li = document.createElement("li");
-      li.className = "menu-card";
-      li.innerHTML = `
-        <div class="menu-card-title">${item.name}</div>
-        <div class="menu-card-description">${item.description || "説明なし"}</div>
-      `;
-      li.addEventListener("click", () => {
-        const u = new URL("recipe.html", location.href);
-        u.searchParams.set("menu", item.id);
-        u.searchParams.set("cat", catId);
-        location.href = u.toString();
-      });
-      list.appendChild(li);
+  list.innerHTML = "";
+  items.forEach(item => {
+    const li = document.createElement("li");
+    li.className = "menu-card";
+    li.innerHTML = `
+      <div class="menu-card-title">${item.name}</div>
+      <div class="menu-card-description">${item.description || "説明なし"}</div>`;
+    li.addEventListener("click", () => {
+      location.href = `recipe.html?menu=${encodeURIComponent(item.id)}&cat=${encodeURIComponent(catId)}`;
     });
-  }
-
-  document.getElementById("backBtn").addEventListener("click", () => {
-    location.href = "index.html";
+    list.appendChild(li);
   });
+}
 
-  loadMenu().catch(console.error);
+document.getElementById("backBtn").addEventListener("click", () => {
+  location.href = "index.html";
+});
+
+loadMenu().catch(console.error);
 </script>
 </body>
 </html>

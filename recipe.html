@@ -6,6 +6,7 @@
   <meta name="robots" content="noindex,nofollow" />
   <title>料理メニュー - レシピ</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="config.js"></script>
 </head>
 <body>
 <header>
@@ -18,57 +19,76 @@
 <footer class="footer">
   <small>© 2026 料理メニューサイト</small>
 </footer>
+
 <script>
-  function getQuery(name) {
-    return new URLSearchParams(location.search).get(name);
+function getQuery(name) {
+  return new URLSearchParams(location.search).get(name);
+}
+
+async function fetchMenus() {
+  try {
+    const r = await fetch(DATA_API_URL);
+    if (!r.ok) throw new Error("api");
+    const j = await r.json();
+    if (j && Array.isArray(j.menus)) return j.menus;
+  } catch {}
+  const r = await fetch("data/menus.json");
+  const j = await r.json();
+  return j.menus || [];
+}
+
+async function loadRecipe() {
+  const menuId = getQuery("menu");
+  const catId = getQuery("cat");
+  const menus = await fetchMenus();
+  const menu = menus.find(m => m.id === menuId);
+
+  const heading = document.getElementById("heading");
+  const content = document.getElementById("recipeContent");
+
+  if (!menu) {
+    heading.textContent = "レシピが見つかりません";
+    content.innerHTML = '<p class="empty">該当メニューが見つかりません。トップに戻ってください。</p>';
+    return;
   }
 
-  async function loadRecipe() {
-    const menuId = getQuery("menu");
-    const catId = getQuery("cat");
-    const res = await fetch("data/menus.json");
-    const json = await res.json();
-
-    const menu = json.menus.find(m => m.id === menuId);
-    const heading = document.getElementById("heading");
-    const content = document.getElementById("recipeContent");
-
-    if (!menu) {
-      heading.textContent = "レシピが見つかりません";
-      content.innerHTML = "<p class='empty'>メニューが見つかりません。トップに戻ってください。</p>";
-      return;
+  heading.textContent = menu.name;
+  const ingredientsHtml = (menu.ingredients || []).map(i => {
+    if (typeof i === "object" && i.item) {
+      return `<div class="ingredient-row"><div class="ingredient-name">${i.item}</div><div class="ingredient-amount">${i.amount || ""}</div></div>`;
     }
+    if (typeof i === "string") {
+      const [item, amount] = i.split(/\s+(.+)/);
+      return `<div class="ingredient-row"><div class="ingredient-name">${item}</div><div class="ingredient-amount">${amount || ""}</div></div>`;
+    }
+    return "";
+  }).join("");
 
-    heading.textContent = menu.name;
-    const ingredientsHtml = (menu.ingredients || []).map(i => `<li>${i}</li>`).join("");
-    const recipeHtml = (menu.recipe || []).map(step => `<li>${step}</li>`).join("");
+  const recipeHtml = (menu.recipe || []).map(step => `<li>${step}</li>`).join("");
 
-    content.innerHTML = `
-      <section class="box">
-        <h2>説明</h2>
-        <p class="menu-card-description">${menu.description || "説明なし"}</p>
-      </section>
-      <section class="box">
-        <h2>材料</h2>
-        <p><strong>分量：</strong>${menu.serving || "不明"}</p>
-        <ul>${ingredientsHtml || "<li>材料が登録されていません。</li>"}</ul>
-      </section>
-      <section class="box">
-        <h2>作り方</h2>
-        <ol>${recipeHtml || "<li>手順が登録されていません。</li>"}</ol>
-      </section>
-    `;
+  content.innerHTML = `
+    <section class="box"><h2>説明</h2>
+      <p class="menu-card-description">${menu.description || "説明なし"}</p>
+    </section>
+    <section class="box"><h2>材料</h2>
+      <p><strong>分量：</strong>${menu.serving || "不明"}</p>
+      <div class="ingredient-list">${ingredientsHtml || "<p>材料が登録されていません。</p>"}</div>
+    </section>
+    <section class="box"><h2>作り方</h2>
+      <ol>${recipeHtml || "<li>手順が登録されていません。</li>"}</ol>
+    </section>
+  `;
+}
+
+document.getElementById("backBtn").addEventListener("click", () => {
+  if (getQuery("cat")) {
+    location.href = `category.html?cat=${encodeURIComponent(getQuery("cat"))}`;
+  } else {
+    location.href = "index.html";
   }
+});
 
-  document.getElementById("backBtn").addEventListener("click", () => {
-    if (getQuery("cat")) {
-      location.href = `category.html?cat=${encodeURIComponent(getQuery("cat"))}`;
-    } else {
-      location.href = "index.html";
-    }
-  });
-
-  loadRecipe().catch(console.error);
+loadRecipe().catch(console.error);
 </script>
 </body>
 </html>
