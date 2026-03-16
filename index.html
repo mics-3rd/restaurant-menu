@@ -1,22 +1,70 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>メニュー</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>料理メニュー一覧</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
-    <header>メニュー</header>
-    <div class="container">
-        <div class="search">
-            <input id="searchInput" placeholder="メニュー検索">
-        </div>
-        <div id="searchResult"></div>
-        <div id="categoryCards" class="cards"></div>
-    </div>
-    <script src="js/app.js"></script>
-</body>
+  <header>
+    <h1>料理メニュー一覧</h1>
+    <p>サーバ/DB不要・静的サイト</p>
+  </header>
 
+  <main>
+    <section class="menu-section">
+      <h2>メニュー</h2>
+      <ul id="menuList" class="menu-list">
+        <!-- JavaScript でメニューを追加 -->
+      </ul>
+    </section>
+
+    <section class="filter-section">
+      <h2>絞り込み</h2>
+      <input id="searchInput" type="search" placeholder="料理名で検索" />
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>© 2026 料理メニューサイト</small>
+  </footer>
+
+  <script>
+    const menus = [
+      { name: "カレーライス", category: "和食", price: 850 },
+      { name: "ハンバーグ定食", category: "洋食", price: 980 },
+      { name: "親子丼", category: "和食", price: 780 },
+      { name: "パスタ", category: "イタリアン", price: 860 },
+      { name: "サラダプレート", category: "サラダ", price: 650 }
+    ];
+
+    const menuList = document.getElementById("menuList");
+    const searchInput = document.getElementById("searchInput");
+
+    function renderMenu(filter = "") {
+      const kw = filter.trim().toLowerCase();
+      menuList.innerHTML = "";
+      const filtered = menus.filter(item => item.name.toLowerCase().includes(kw));
+      if (filtered.length === 0) {
+        menuList.innerHTML = "<li class=\"empty\">対象のメニューがありません</li>";
+        return;
+      }
+      filtered.forEach(item => {
+        const li = document.createElement("li");
+        li.className = "menu-item";
+        li.innerHTML = `
+          <strong>${item.name}</strong>
+          <span class="category">${item.category}</span>
+          <span class="price">${item.price}円</span>
+        `;
+        menuList.appendChild(li);
+      });
+    }
+
+    searchInput.addEventListener("input", () => renderMenu(searchInput.value));
+    renderMenu();
+  </script>
+</body>
 </html>
