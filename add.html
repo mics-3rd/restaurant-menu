@@ -36,10 +36,30 @@
 
 <script>
 async function init() {
-  // 既存カテゴリ読み込み
+  const select = document.getElementById("category");
+  select.innerHTML = "";
+  try {
+    const resp = await fetch("data/menus.json");
+    if (!resp.ok) throw new Error("ファイル読み込み失敗");
+    const data = await resp.json();
+    const categories = Array.isArray(data.categories) ? data.categories : [];
+    if (categories.length === 0) {
+      select.innerHTML = `<option value="">カテゴリがありません</option>`;
+      return;
+    }
+    categories.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = c.name;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    select.innerHTML = `<option value="">読み込みエラー</option>`;
+    console.error("カテゴリ読み込み失敗", err);
+  }
 }
 
-document.getElementById("addForm").addEventListener("submit", async(e)=> {
+document.getElementById("addForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("statusMessage");
   status.style.color = "#4a2f1f";
