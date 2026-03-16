@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>料理メニュー - レシピ</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1 id="heading">レシピ</h1>
+</header>
+<main>
+  <button id="backBtn" class="back-btn" type="button">戻る</button>
+  <article id="recipeContent" class="recipe-content"></article>
+</main>
+<footer class="footer">
+  <small>© 2026 料理メニューサイト</small>
+</footer>
+<script>
+  function getQuery(name) {
+    return new URLSearchParams(location.search).get(name);
+  }
+
+  async function loadRecipe() {
+    const menuId = getQuery("menu");
+    const catId = getQuery("cat");
+    const res = await fetch("data/menus.json");
+    const json = await res.json();
+
+    const menu = json.menus.find(m => m.id === menuId);
+    const heading = document.getElementById("heading");
+    const content = document.getElementById("recipeContent");
+
+    if (!menu) {
+      heading.textContent = "レシピが見つかりません";
+      content.innerHTML = '<p class="empty">メニューが見つかりません。トップに戻ってください。</p>';
+      return;
+    }
+    heading.textContent = menu.name;
+    const recipeHtml = `
+      <p class="menu-card-description">${menu.description || "説明なし"}</p>
+      <h2>作り方</h2>
+      <ol>
+        ${(menu.recipe || []).map(step => `<li>${step}</li>`).join("")}
+      </ol>
+    `;
+    content.innerHTML = recipeHtml;
+  }
+
+  document.getElementById("backBtn").addEventListener("click", () => {
+    if (getQuery("cat")) {
+      location.href = `category.html?cat=${encodeURIComponent(getQuery("cat"))}`;
+    } else {
+      location.href = "index.html";
+    }
+  });
+
+  loadRecipe().catch(console.error);
+</script>
+</body>
+</html>

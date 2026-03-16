@@ -52,6 +52,12 @@
         <div class="menu-card-title">${item.name}</div>
         <div class="menu-card-description">${item.description || "説明なし"}</div>
       `;
+      li.addEventListener("click", () => {
+        const u = new URL("recipe.html", location.href);
+        u.searchParams.set("menu", item.id);
+        u.searchParams.set("cat", catId);
+        location.href = u.toString();
+      });
       list.appendChild(li);
     });
   }
