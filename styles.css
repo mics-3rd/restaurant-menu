@@ -34,9 +34,10 @@ main {
   background: #e5d3c3;
   color: #4b3224;
   border-radius: 12px;
-  padding: 1.6rem;
-  min-height: 132px;
-  font-size: 1.1rem;
+  padding: 0;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  font-size: 1.15rem;
   cursor: pointer;
   text-align: center;
   display: flex;
@@ -93,8 +94,13 @@ main {
 
 @media (max-width: 700px) {
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .card { min-height: 120px; font-size: 1.05rem; padding: 1.2rem; }
+  .card {
+    aspect-ratio: 1.05 / 1;
+    font-size: 1.05rem;
+    padding: 0.5rem;
+  }
 }
 @media (max-width: 480px) {
   .grid { grid-template-columns: 1fr; }
+  .card { aspect-ratio: 1.2 / 1; }
 }
