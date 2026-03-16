@@ -24,7 +24,7 @@ main {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* モバイル：1行2つ */
   gap: 0.8rem;
   padding: 0;
 }
@@ -77,14 +77,8 @@ main {
   padding: 0.8rem 0;
 }
 
-.price {
-  font-weight: 700;
-}
-
-.empty {
-  padding: 0.7rem 0;
-  color: #7a6758;
-}
+.price { font-weight: 700; }
+.empty { padding: 0.7rem 0; color: #7a6758; }
 
 .footer {
   text-align: center;
@@ -92,15 +86,20 @@ main {
   color: #5f4836;
 }
 
-@media (max-width: 700px) {
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .card {
-    aspect-ratio: 1.05 / 1;
-    font-size: 1.05rem;
-    padding: 0.5rem;
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* 広い画面で3列 */
   }
 }
-@media (max-width: 480px) {
-  .grid { grid-template-columns: 1fr; }
-  .card { aspect-ratio: 1.2 / 1; }
+
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)); /* 更に広い画面で4列 */
+  }
+}
+
+@media (max-width: 400px) {
+  .grid {
+    grid-template-columns: 1fr; /* 超狭小時は1列 */
+  }
 }
