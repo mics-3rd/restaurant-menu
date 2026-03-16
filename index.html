@@ -1,50 +1,26 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex,nofollow" />
-  <title>料理メニューカテゴリ</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="config.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>料理メニューカテゴリ</title>
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 <header>
   <h1>料理メニューカテゴリ</h1>
-  <p>カテゴリを選択してメニューを見る</p>
   <a class="add-button" href="add.html">＋ メニュー追加</a>
 </header>
 <main>
-  <section>
-    <div id="categoryGrid" class="grid"></div>
-  </section>
+  <div id="categoryGrid" class="grid"></div>
 </main>
-<footer class="footer">
-  <small>© 2026 料理メニューサイト</small>
-</footer>
-
+<footer class="footer"><small>© 2026 料理メニューサイト</small></footer>
 <script>
-async function fetchMenus() {
-  try {
-    const resp = await fetch(DATA_API_URL);
-    if (!resp.ok) throw new Error("api error");
-    const body = await resp.json();
-    if (body && Array.isArray(body.menus)) return body.menus;
-    throw new Error("invalid api response");
-  } catch {
-    const resp = await fetch("data/menus.json");
-    const body = await resp.json();
-    return body.menus || [];
-  }
-}
-
 async function loadCategories() {
-  const resp = await fetch("data/menus.json");
-  const body = await resp.json();
-  const categories = body.categories || [];
-  const grid = document.getElementById("categoryGrid");
-  grid.innerHTML = "";
-  categories.forEach(c => {
+  const data = await fetch("data/menus.json").then(r => r.json());
+  const list = document.getElementById("categoryGrid");
+  list.innerHTML = "";
+  (data.categories || []).forEach(c => {
     const btn = document.createElement("button");
     btn.className = "card";
     btn.type = "button";
@@ -52,10 +28,9 @@ async function loadCategories() {
     btn.addEventListener("click", () => {
       location.href = `category.html?cat=${encodeURIComponent(c.id)}`;
     });
-    grid.appendChild(btn);
+    list.appendChild(btn);
   });
 }
-
 loadCategories().catch(console.error);
 </script>
 </body>

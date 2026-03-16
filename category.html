@@ -26,44 +26,38 @@ function getQuery(name) {
 }
 
 async function fetchMenus() {
-  try {
-    const r = await fetch(DATA_API_URL, { mode:"cors" });
-    if (!r.ok) throw new Error("APIエラー " + r.status);
-    const j = await r.json();
-    if (j && Array.isArray(j.menus)) return j.menus;
-    throw new Error("APIレスポンス不正");
-  } catch (e) {
-    console.warn("API読込失敗", e);
-    const r2 = await fetch("data/menus.json");
-    const j2 = await r2.json();
-    return j2.menus || [];
-  }
+  const json = await fetch("data/menus.json").then(r => r.json());
+  const custom = JSON.parse(localStorage.getItem("customMenus") || "[]");
+  return [...(json.menus || []), ...custom];
 }
 
 async function loadMenu() {
   const catId = getQuery("cat");
-  const menus = await fetchMenus();
-  const catData = await (await fetch("data/menus.json")).json();
-  const cat = (catData.categories || []).find(x => x.id === catId);
+  const data = await fetch("data/menus.json").then(r=>r.json());
+  const cat = (data.categories||[]).find(c => c.id === catId);
   const heading = document.getElementById("heading");
   const list = document.getElementById("menuList");
+
   if (!cat) {
     heading.textContent = "不明なカテゴリ";
     list.innerHTML = '<li class="empty">カテゴリが見つかりません。</li>';
     return;
   }
+
   heading.textContent = `${cat.name} のメニュー`;
-  const items = menus.filter(i => i.category === catId);
+  const items = (await fetchMenus()).filter(m => m.category === catId);
   if (!items.length) {
     list.innerHTML = '<li class="empty">メニューがありません。</li>';
     return;
   }
+
   list.innerHTML = "";
   items.forEach(item => {
     const li = document.createElement("li");
     li.className = "menu-card";
-    li.innerHTML = `<div class="menu-card-title">${item.name}</div>
-                    <div class="menu-card-description">${item.description || "説明なし"}</div>`;
+    li.innerHTML = `
+      <div class="menu-card-title">${item.name}</div>
+      <div class="menu-card-description">${item.description || "説明なし"}</div>`;
     li.addEventListener("click", () => {
       location.href = `recipe.html?menu=${encodeURIComponent(item.id)}&cat=${encodeURIComponent(catId)}`;
     });
@@ -71,10 +65,10 @@ async function loadMenu() {
   });
 }
 
-document.getElementById("backBtn").addEventListener("click",()=>{ location.href="index.html"; });
+document.getElementById("backBtn").addEventListener("click", () => location.href = "index.html");
 loadMenu().catch(err => {
   console.error(err);
-  document.getElementById("menuList").innerHTML = '<li class="empty">データの読み込みに失敗しました。</li>';
+  document.getElementById("menuList").innerHTML = '<li class="empty">読み込み失敗</li>';
 });
 </script>
 </body>

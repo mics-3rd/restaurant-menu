@@ -1,1 +1,2 @@
-const DATA_API_URL = "https://script.google.com/macros/s/AKfycbzC2uhIgjkaXI1f6OdN_zyJo2jN89BXysAdthTTXNl-0xNEsCxZcERTEQFsyf6r_M0/exec";
+// いまはスプレッドシートAPIを使わないので空にしておく
+const DATA_API_URL = "";
