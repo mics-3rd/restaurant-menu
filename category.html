@@ -12,7 +12,7 @@
   <h1 id="heading">メニュー</h1>
 </header>
 <main>
-  <button id="backBtn" class="back-btn" type="button">← トップに戻る</button>
+  <button id="backBtn" class="back-btn" type="button">戻る</button>
   <ul id="menuList" class="menu-list"></ul>
 </main>
 <footer class="footer">
@@ -22,7 +22,6 @@
   function getQuery(name) {
     return new URLSearchParams(location.search).get(name);
   }
-
   async function loadMenu() {
     const catId = getQuery("cat");
     const res = await fetch("data/menus.json");
@@ -35,14 +34,12 @@
       list.innerHTML = '<li class="empty">カテゴリ情報が見つかりません。</li>';
       return;
     }
-
     heading.textContent = `${cat.name} のメニュー`;
     const items = json.menus.filter(m => m.category === catId);
     if (items.length === 0) {
       list.innerHTML = '<li class="empty">メニューがありません。</li>';
       return;
     }
-
     list.innerHTML = "";
     items.forEach(item => {
       const li = document.createElement("li");
@@ -51,11 +48,9 @@
       list.appendChild(li);
     });
   }
-
   document.getElementById("backBtn").addEventListener("click", () => {
     location.href = "index.html";
   });
-
   loadMenu().catch(console.error);
 </script>
 </body>
