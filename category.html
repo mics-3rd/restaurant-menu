@@ -23,6 +23,19 @@
     return new URLSearchParams(location.search).get(name);
   }
 
+  async function fetchMenus() {
+    try {
+      const r = await fetch(DATA_API_URL);
+      if (!r.ok) throw new Error("API error");
+      const j = await r.json();
+      return j.menus || [];
+    } catch {
+      const r = await fetch("data/menus.json");
+      const j = await r.json();
+      return j.menus || [];
+    }
+  }
+
   async function loadMenu() {
     const catId = getQuery("cat");
     const res = await fetch("data/menus.json");
