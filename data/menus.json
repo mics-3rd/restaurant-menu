@@ -6,13 +6,13 @@
     { "id": "salad", "name": "サラダ" }
   ],
   "menus": [
-    { "name": "ビーフステーキ", "category": "meat", "price": 1200 },
-    { "name": "豚の生姜焼き", "category": "meat", "price": 980 },
-    { "name": "サーモンの塩焼き", "category": "fish", "price": 1040 },
-    { "name": "アジフライ", "category": "fish", "price": 890 },
-    { "name": "コーンスープ", "category": "soup", "price": 550 },
-    { "name": "ミネストローネ", "category": "soup", "price": 620 },
-    { "name": "野菜サラダ", "category": "salad", "price": 600 },
-    { "name": "シーザーサラダ", "category": "salad", "price": 680 }
+    { "name": "ビーフステーキ", "category": "meat", "description": "ジューシーな牛肉のステーキ。特製ソース付き。" },
+    { "name": "豚の生姜焼き", "category": "meat", "description": "香ばしいたれで仕上げた定番の生姜焼き。" },
+    { "name": "サーモンの塩焼き", "category": "fish", "description": "皮目はカリッと、中はふっくら焼き上げ。" },
+    { "name": "アジフライ", "category": "fish", "description": "外はサクサク、アジの旨味を閉じ込めた逸品。" },
+    { "name": "コーンスープ", "category": "soup", "description": "甘みたっぷりのコーンを使ったクリーミーなスープ。" },
+    { "name": "ミネストローネ", "category": "soup", "description": "野菜たっぷり、トマトベースのイタリアンスープ。" },
+    { "name": "野菜サラダ", "category": "salad", "description": "新鮮野菜をたっぷり、ドレッシング選択可。" },
+    { "name": "シーザーサラダ", "category": "salad", "description": "チーズとベーコンの香りがアクセントのサラダ。" }
   ]
 }

@@ -24,22 +24,9 @@ main {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)); /* モバイル含め基本2列 */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.8rem;
   padding: 0;
-}
-
-@media (max-width: 500px) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* iPhone でも2列 */
-  }
-}
-
-/* 画面が極端に狭い場合のみ1列 */
-@media (max-width: 340px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .card {
@@ -48,7 +35,7 @@ main {
   color: #4b3224;
   border-radius: 12px;
   padding: 0;
-  aspect-ratio: 3 / 2; /* 1 => 2/3 に変更 */
+  aspect-ratio: 10 / 7; /* 横幅に対して縦幅約0.7 */
   min-height: 0;
   font-size: 1.15rem;
   cursor: pointer;
@@ -80,18 +67,37 @@ main {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  gap: 0.8rem;
 }
 
-.menu-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #dbc7b4;
-  padding: 0.8rem 0;
+.menu-card {
+  border: 1px solid #7a5a41;
+  border-radius: 12px;
+  background: #f1e6d9;
+  padding: 0.9rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: grid;
+  row-gap: 0.3rem;
 }
 
-.price { font-weight: 700; }
-.empty { padding: 0.7rem 0; color: #7a6758; }
+.menu-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #442f24;
+}
+
+.menu-card-description {
+  font-size: 0.95rem;
+  color: #7a6758;
+}
+
+.menu-item { /* 不使用でも残してOK */ }
+.price { display: none; }
+.empty {
+  padding: 0.7rem 0;
+  color: #7a6758;
+}
 
 .footer {
   text-align: center;
@@ -99,20 +105,22 @@ main {
   color: #5f4836;
 }
 
-@media (min-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr)); /* 広い画面で3列 */
+@media (max-width: 500px) {
+  .card {
+    aspect-ratio: 10 / 7;
+    font-size: 1.05rem;
+    padding: 0.6rem;
   }
+}
+
+@media (min-width: 900px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (min-width: 1200px) {
-  .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)); /* 更に広い画面で4列 */
-  }
+  .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-@media (max-width: 400px) {
-  .grid {
-    grid-template-columns: 1fr; /* 超狭小時は1列 */
-  }
+@media (max-width: 340px) {
+  .grid { grid-template-columns: 1fr; }
 }

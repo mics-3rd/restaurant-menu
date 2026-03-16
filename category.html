@@ -22,6 +22,7 @@
   function getQuery(name) {
     return new URLSearchParams(location.search).get(name);
   }
+
   async function loadMenu() {
     const catId = getQuery("cat");
     const res = await fetch("data/menus.json");
@@ -29,28 +30,36 @@
     const cat = json.categories.find(c => c.id === catId);
     const heading = document.getElementById("heading");
     const list = document.getElementById("menuList");
+
     if (!cat) {
       heading.textContent = "不明なカテゴリ";
       list.innerHTML = '<li class="empty">カテゴリ情報が見つかりません。</li>';
       return;
     }
+
     heading.textContent = `${cat.name} のメニュー`;
     const items = json.menus.filter(m => m.category === catId);
     if (items.length === 0) {
       list.innerHTML = '<li class="empty">メニューがありません。</li>';
       return;
     }
+
     list.innerHTML = "";
     items.forEach(item => {
       const li = document.createElement("li");
-      li.className = "menu-item";
-      li.innerHTML = `<strong>${item.name}</strong><span class="price">${item.price}円</span>`;
+      li.className = "menu-card";
+      li.innerHTML = `
+        <div class="menu-card-title">${item.name}</div>
+        <div class="menu-card-description">${item.description || "説明なし"}</div>
+      `;
       list.appendChild(li);
     });
   }
+
   document.getElementById("backBtn").addEventListener("click", () => {
     location.href = "index.html";
   });
+
   loadMenu().catch(console.error);
 </script>
 </body>
