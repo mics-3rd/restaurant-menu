@@ -9,7 +9,7 @@ header {
 }
 main { max-width: none; margin: 0.8rem; padding: 0; background: transparent; box-shadow: none; border-radius: 0; }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; padding: 0; }
-.card { border: 1px solid #a8cac5; background: #e8f4f0; color: #1a3a34; border-radius: 12px; padding: 0; aspect-ratio: 10 / 7; min-height: 0; font-size: 1.15rem; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; }
+.card { border: 1px solid #a8cac5; background: #e8f4f0; color: #1a3a34; border-radius: 12px; padding: 0; aspect-ratio: 10 / 7; min-height: 0; font-size: 1.35rem; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; }
 .card:hover { background: #d4ece7; }
 .add-button { display: inline-block; margin: .6rem 0; padding: .6rem 1rem; border-radius: 8px; background: #25615a; color: #fff; text-decoration: none; font-weight: bold; }
 .add-button:hover { background: #1e4d47; }
