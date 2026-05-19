@@ -13,7 +13,7 @@ const section = (title) => {
   return m ? m[0].replace(new RegExp(`## ${title}`), "").trim() : "";
 };
 
-const category = ["meat","fish","soup","salad"].find(c => body.includes(c));
+const category = ["meat","fish","noodles","side","soup","sweets","others"].find(c => body.includes(c));
 const name = section("メニュー名").split("\n")[0].trim();
 const description = section("説明").split("\n")[0].trim();
 const serving = section("分量").split("\n")[0].trim();

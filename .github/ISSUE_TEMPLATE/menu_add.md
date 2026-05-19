@@ -9,8 +9,11 @@ assignees: ''
 ## カテゴリ
 - [ ] meat
 - [ ] fish
+- [ ] noodles
+- [ ] side
 - [ ] soup
-- [ ] salad
+- [ ] sweets
+- [ ] others
 
 ## メニュー名
 

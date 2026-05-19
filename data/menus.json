@@ -2,8 +2,11 @@
   "categories": [
     { "id": "meat", "name": "肉料理" },
     { "id": "fish", "name": "魚料理" },
-    { "id": "soup", "name": "スープ" },
-    { "id": "salad", "name": "サラダ" }
+    { "id": "noodles", "name": "麺料理" },
+    { "id": "side", "name": "副菜" },
+    { "id": "soup", "name": "汁物" },
+    { "id": "sweets", "name": "スイーツ" },
+    { "id": "others", "name": "その他" }
   ],
   "menus": [
     {
