@@ -28,6 +28,96 @@ async function fetchMenus() {
   return json.menus || [];
 }
 
+let currentMenu = null;
+let baseServing = 1;
+let currentServing = 1;
+let servingLabel = n => `×${n}`;
+
+function parseServing(str) {
+  if (!str) return { base: 2, label: n => `${n}人分` };
+  const m = str.match(/(\d+)(人分|人前)/);
+  if (m) {
+    const unit = m[2];
+    return { base: parseInt(m[1]), label: n => `${n}${unit}` };
+  }
+  return { base: 1, label: n => `×${n}` };
+}
+
+function evalFrac(s) {
+  if (s.includes("/")) {
+    const parts = s.split("/");
+    return parseFloat(parts[0]) / parseFloat(parts[1]);
+  }
+  return parseFloat(s);
+}
+
+function formatNum(n) {
+  if (n <= 0) return "0";
+  const r = Math.round(n * 10) / 10;
+  return r % 1 === 0 ? String(Math.round(r)) : String(r);
+}
+
+function scaleAmount(str, ratio) {
+  if (!str || ratio === 1) return str;
+  // prefix unit + number: 大さじ1, 小さじ1/2, カップ1（分数を先にマッチ）
+  const prefixRe = /^(大さじ|小さじ|カップ)\s*(\d+\/\d+|\d+(?:\.\d+)?)(.*)/;
+  // number + suffix (not a range like 〜): 300g, 2枚, 1.5リットル
+  const suffixRe = /^(\d+\/\d+|\d+(?:\.\d+)?)(\s*[^〜～\d].*|$)/;
+  let m;
+  if ((m = prefixRe.exec(str))) {
+    return m[1] + formatNum(evalFrac(m[2]) * ratio) + m[3];
+  }
+  if ((m = suffixRe.exec(str))) {
+    return formatNum(evalFrac(m[1]) * ratio) + m[2];
+  }
+  return str; // 適量・少々・あれば など
+}
+
+function renderIngredients(ratio) {
+  const list = document.getElementById("ingredientList");
+  if (!list) return;
+  list.innerHTML = "";
+  const items = currentMenu.ingredients || [];
+  if (!items.length) {
+    const p = document.createElement("p");
+    p.textContent = "材料が登録されていません";
+    list.appendChild(p);
+    return;
+  }
+  items.forEach(i => {
+    let item, amount;
+    if (typeof i === "object") {
+      item = i.item || "";
+      amount = i.amount || "";
+    } else {
+      const parts = i.split(/\s+(.+)/);
+      item = parts[0] || "";
+      amount = parts[1] || "";
+    }
+    const row = document.createElement("div");
+    row.className = "ingredient-row";
+    const nameEl = document.createElement("div");
+    nameEl.className = "ingredient-name";
+    nameEl.textContent = item;
+    const amtEl = document.createElement("div");
+    amtEl.className = "ingredient-amount";
+    amtEl.textContent = scaleAmount(amount, ratio);
+    row.appendChild(nameEl);
+    row.appendChild(amtEl);
+    list.appendChild(row);
+  });
+}
+
+function changeServing(delta) {
+  currentServing = Math.max(1, currentServing + delta);
+  document.getElementById("servingDisplay").textContent = servingLabel(currentServing);
+  renderIngredients(currentServing / baseServing);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 async function loadRecipe() {
   const menuId = getQuery("menu");
   const menus = await fetchMenus();
@@ -41,24 +131,47 @@ async function loadRecipe() {
     return;
   }
 
+  currentMenu = menu;
+  const sv = parseServing(menu.serving);
+  baseServing = sv.base;
+  currentServing = sv.base;
+  servingLabel = sv.label;
+
   heading.textContent = menu.name;
-  const ingredients = (menu.ingredients || []).map(i => {
-    if (typeof i === "object") return `<div class="ingredient-row"><div class="ingredient-name">${i.item}</div><div class="ingredient-amount">${i.amount||""}</div></div>`;
-    const [item, amount] = i.split(/\s+(.+)/);
-    return `<div class="ingredient-row"><div class="ingredient-name">${item}</div><div class="ingredient-amount">${amount||""}</div></div>`;
-  }).join("");
-  const recipe = (menu.recipe || []).map(step => `<li>${step}</li>`).join("");
+
+  const recipeSteps = (menu.recipe || []).map(s => `<li>${escHtml(s)}</li>`).join("") || "<li>手順が登録されていません</li>";
 
   content.innerHTML = `
-    <section class="box"><h2>説明</h2><p class="menu-card-description">${menu.description || "説明なし"}</p></section>
-    <section class="box"><h2>材料</h2><p><strong>分量：</strong>${menu.serving || "不明"}</p><div class="ingredient-list">${ingredients || "<p>材料が登録されていません</p>"}</div></section>
-    <section class="box"><h2>作り方</h2><ol>${recipe || "<li>手順が登録されていません</li>"}</ol></section>`;
+    <section class="box">
+      <h2>説明</h2>
+      <p class="menu-card-description" id="recipeDesc"></p>
+    </section>
+    <section class="box">
+      <h2>材料</h2>
+      <div class="serving-control">
+        <button class="serve-btn" type="button" id="serveDown">－</button>
+        <span id="servingDisplay">${escHtml(servingLabel(currentServing))}</span>
+        <button class="serve-btn" type="button" id="serveUp">＋</button>
+      </div>
+      <div class="ingredient-list" id="ingredientList"></div>
+    </section>
+    <section class="box">
+      <h2>作り方</h2>
+      <ol>${recipeSteps}</ol>
+    </section>`;
+
+  document.getElementById("recipeDesc").textContent = menu.description || "説明なし";
+  renderIngredients(1);
+
+  document.getElementById("serveDown").addEventListener("click", () => changeServing(-1));
+  document.getElementById("serveUp").addEventListener("click", () => changeServing(1));
 }
 
-document.getElementById("backBtn").addEventListener("click", ()=> {
+document.getElementById("backBtn").addEventListener("click", () => {
   const cat = getQuery("cat");
   location.href = cat ? `category.html?cat=${encodeURIComponent(cat)}` : "index.html";
 });
+
 loadRecipe().catch(err => {
   console.error(err);
   document.getElementById("recipeContent").innerHTML = '<p class="empty">読み込み失敗</p>';
