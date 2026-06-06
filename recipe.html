@@ -67,6 +67,20 @@ function evalFrac(s) {
 
 function formatNum(n) {
   if (n <= 0) return "0";
+  const whole = Math.floor(n);
+  const frac = n - whole;
+
+  if (frac < 0.03) return String(whole);
+
+  const knownFracs = [[1,2],[1,3],[2,3],[1,4],[3,4],[1,6],[5,6],[1,8],[3,8],[5,8],[7,8]];
+  for (const [num, den] of knownFracs) {
+    if (Math.abs(frac - num / den) < 0.03) {
+      const fracStr = `${num}/${den}`;
+      return whole === 0 ? fracStr : `${whole}と${fracStr}`;
+    }
+  }
+
+  // 分数で表せない場合は小数1桁
   const r = Math.round(n * 10) / 10;
   return r % 1 === 0 ? String(Math.round(r)) : String(r);
 }
