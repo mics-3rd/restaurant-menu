@@ -12,19 +12,30 @@
   <h1>～MENU～</h1>
 </header>
 <main>
-  <section>
+  <div class="search-bar">
+    <input type="search" id="searchInput" placeholder="メニュー名・材料名で検索" autocomplete="off" />
+  </div>
+
+  <section id="categoryView">
     <div id="categoryGrid" class="grid"></div>
+  </section>
+
+  <section id="searchView" style="display:none">
+    <div id="searchResultCount" class="search-result-count"></div>
+    <ul id="searchResults" class="menu-list"></ul>
   </section>
 </main>
 <footer class="footer">
   <small>© みっくん食堂</small>
 </footer>
 <script>
+let allData = null;
+
 async function loadCategories() {
-  const data = await fetch("data/menus.json").then(r => r.json());
+  allData = await fetch("data/menus.json").then(r => r.json());
   const grid = document.getElementById("categoryGrid");
   grid.innerHTML = "";
-  (data.categories || []).forEach(c => {
+  (allData.categories || []).forEach(c => {
     const btn = document.createElement("button");
     btn.className = "card";
     btn.type = "button";
@@ -35,6 +46,71 @@ async function loadCategories() {
     grid.appendChild(btn);
   });
 }
+
+function catName(id) {
+  return ((allData.categories || []).find(c => c.id === id) || {}).name || id;
+}
+
+function doSearch(query) {
+  const q = query.trim().toLowerCase();
+  const catView = document.getElementById("categoryView");
+  const searchView = document.getElementById("searchView");
+
+  if (!q) {
+    catView.style.display = "block";
+    searchView.style.display = "none";
+    return;
+  }
+
+  catView.style.display = "none";
+  searchView.style.display = "block";
+
+  const menus = (allData ? allData.menus || [] : []).filter(m => {
+    if (m.name.toLowerCase().includes(q)) return true;
+    return (m.ingredients || []).some(i => {
+      const text = typeof i === "object" ? (i.item || "") : i;
+      return text.toLowerCase().includes(q);
+    });
+  });
+
+  const count = document.getElementById("searchResultCount");
+  const list = document.getElementById("searchResults");
+  count.textContent = `${menus.length} 件`;
+  list.innerHTML = "";
+
+  if (!menus.length) {
+    list.innerHTML = '<li class="empty">該当するメニューがありません</li>';
+    return;
+  }
+
+  menus.forEach(menu => {
+    const li = document.createElement("li");
+    li.className = "menu-card";
+
+    const cat = document.createElement("div");
+    cat.className = "menu-card-cat";
+    cat.textContent = catName(menu.category);
+
+    const title = document.createElement("div");
+    title.className = "menu-card-title";
+    title.textContent = menu.name;
+
+    const desc = document.createElement("div");
+    desc.className = "menu-card-description";
+    desc.textContent = menu.description || "";
+
+    li.appendChild(cat);
+    li.appendChild(title);
+    li.appendChild(desc);
+    li.addEventListener("click", () => {
+      location.href = `recipe.html?menu=${encodeURIComponent(menu.id)}&cat=${encodeURIComponent(menu.category)}`;
+    });
+    list.appendChild(li);
+  });
+}
+
+document.getElementById("searchInput").addEventListener("input", e => doSearch(e.target.value));
+
 loadCategories().catch(err => console.error(err));
 </script>
 </body>
