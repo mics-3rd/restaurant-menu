@@ -16,8 +16,17 @@
     <input type="search" id="searchInput" placeholder="メニュー名・材料名で検索" autocomplete="off" />
   </div>
 
-  <section id="categoryView">
+  <div class="view-toggle" id="viewToggle">
+    <button class="view-btn active" data-view="categories" onclick="switchView('categories')">カテゴリ</button>
+    <button class="view-btn" data-view="favorites" onclick="switchView('favorites')">♥ お気に入り</button>
+  </div>
+
+  <section id="categorySection">
     <div id="categoryGrid" class="grid"></div>
+  </section>
+
+  <section id="favSection" style="display:none">
+    <ul id="favList" class="menu-list"></ul>
   </section>
 
   <section id="searchView" style="display:none">
@@ -30,6 +39,10 @@
 </footer>
 <script>
 let allData = null;
+let currentView = "categories";
+
+const FAV_KEY = "favorites";
+function getFavorites() { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch { return []; } }
 
 async function loadCategories() {
   allData = await fetch("data/menus.json").then(r => r.json());
@@ -51,18 +64,72 @@ function catName(id) {
   return ((allData.categories || []).find(c => c.id === id) || {}).name || id;
 }
 
-function doSearch(query) {
-  const q = query.trim().toLowerCase();
-  const catView = document.getElementById("categoryView");
-  const searchView = document.getElementById("searchView");
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll(".view-btn").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+  document.getElementById("categorySection").style.display = view === "categories" ? "block" : "none";
+  document.getElementById("favSection").style.display = view === "favorites" ? "block" : "none";
+  if (view === "favorites") renderFavorites();
+}
 
-  if (!q) {
-    catView.style.display = "block";
-    searchView.style.display = "none";
+function renderFavorites() {
+  const favIds = getFavorites();
+  const list = document.getElementById("favList");
+  list.innerHTML = "";
+
+  if (!favIds.length) {
+    list.innerHTML = '<li class="fav-empty">お気に入りがありません<br><small>レシピページの ♡ から追加できます</small></li>';
     return;
   }
 
-  catView.style.display = "none";
+  const menus = (allData ? allData.menus || [] : []).filter(m => favIds.includes(m.id));
+  if (!menus.length) {
+    list.innerHTML = '<li class="fav-empty">お気に入りがありません</li>';
+    return;
+  }
+
+  menus.forEach(menu => {
+    const li = document.createElement("li");
+    li.className = "menu-card";
+
+    const cat = document.createElement("div");
+    cat.className = "menu-card-cat";
+    cat.textContent = catName(menu.category);
+
+    const title = document.createElement("div");
+    title.className = "menu-card-title";
+    title.textContent = menu.name;
+
+    const desc = document.createElement("div");
+    desc.className = "menu-card-description";
+    desc.textContent = menu.description || "";
+
+    li.appendChild(cat);
+    li.appendChild(title);
+    li.appendChild(desc);
+    li.addEventListener("click", () => {
+      location.href = `recipe.html?menu=${encodeURIComponent(menu.id)}&cat=${encodeURIComponent(menu.category)}`;
+    });
+    list.appendChild(li);
+  });
+}
+
+function doSearch(query) {
+  const q = query.trim().toLowerCase();
+  const toggle = document.getElementById("viewToggle");
+  const searchView = document.getElementById("searchView");
+
+  if (!q) {
+    toggle.style.display = "";
+    searchView.style.display = "none";
+    document.getElementById("categorySection").style.display = currentView === "categories" ? "block" : "none";
+    document.getElementById("favSection").style.display = currentView === "favorites" ? "block" : "none";
+    return;
+  }
+
+  toggle.style.display = "none";
+  document.getElementById("categorySection").style.display = "none";
+  document.getElementById("favSection").style.display = "none";
   searchView.style.display = "block";
 
   const menus = (allData ? allData.menus || [] : []).filter(m => {

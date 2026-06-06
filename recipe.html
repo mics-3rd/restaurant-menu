@@ -10,7 +10,10 @@
 </head>
 <body>
 <header>
-  <h1 id="heading">レシピ</h1>
+  <div class="recipe-header">
+    <h1 id="heading">レシピ</h1>
+    <button id="favBtn" class="fav-btn" type="button" aria-label="お気に入り">♡</button>
+  </div>
 </header>
 <main>
   <button id="backBtn" class="back-btn" type="button">戻る</button>
@@ -22,6 +25,17 @@
 
 <script>
 function getQuery(name) { return new URLSearchParams(location.search).get(name); }
+
+const FAV_KEY = "favorites";
+function getFavorites() { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch { return []; } }
+function setFavorites(ids) { localStorage.setItem(FAV_KEY, JSON.stringify(ids)); }
+function updateFavBtn(id) {
+  const btn = document.getElementById("favBtn");
+  const isFav = getFavorites().includes(id);
+  btn.textContent = isFav ? "♥" : "♡";
+  btn.classList.toggle("active", isFav);
+  btn.setAttribute("aria-label", isFav ? "お気に入りから削除" : "お気に入りに追加");
+}
 
 async function fetchMenus() {
   const json = await fetch("data/menus.json").then(r => r.json());
@@ -165,6 +179,15 @@ async function loadRecipe() {
 
   document.getElementById("serveDown").addEventListener("click", () => changeServing(-1));
   document.getElementById("serveUp").addEventListener("click", () => changeServing(1));
+
+  updateFavBtn(menu.id);
+  document.getElementById("favBtn").addEventListener("click", () => {
+    const favs = getFavorites();
+    const idx = favs.indexOf(menu.id);
+    if (idx >= 0) favs.splice(idx, 1); else favs.push(menu.id);
+    setFavorites(favs);
+    updateFavBtn(menu.id);
+  });
 }
 
 document.getElementById("backBtn").addEventListener("click", () => {
