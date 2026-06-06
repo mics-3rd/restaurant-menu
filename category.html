@@ -25,12 +25,6 @@ function getQuery(name) {
   return new URLSearchParams(location.search).get(name);
 }
 
-async function fetchMenus() {
-  const json = await fetch("data/menus.json").then(r => r.json());
-  const custom = JSON.parse(localStorage.getItem("customMenus") || "[]");
-  return [...(json.menus || []), ...custom];
-}
-
 async function loadMenu() {
   const catId = getQuery("cat");
   const json = await fetch("data/menus.json").then(r => r.json());
@@ -45,7 +39,7 @@ async function loadMenu() {
   }
   heading.textContent = `${cat.name} のメニュー`;
 
-  const items = (await fetchMenus()).filter(m => m.category === catId);
+  const items = (json.menus || []).filter(m => m.category === catId);
   if (!items.length) {
     list.innerHTML = '<li class="empty">メニューがありません。</li>';
     return;
@@ -55,9 +49,17 @@ async function loadMenu() {
   items.forEach(item => {
     const li = document.createElement("li");
     li.className = "menu-card";
-    li.innerHTML = `
-      <div class="menu-card-title">${item.name}</div>
-      <div class="menu-card-description">${item.description || "説明なし"}</div>`;
+
+    const title = document.createElement("div");
+    title.className = "menu-card-title";
+    title.textContent = item.name;
+
+    const desc = document.createElement("div");
+    desc.className = "menu-card-description";
+    desc.textContent = item.description || "説明なし";
+
+    li.appendChild(title);
+    li.appendChild(desc);
     li.addEventListener("click", () => {
       location.href = `recipe.html?menu=${encodeURIComponent(item.id)}&cat=${encodeURIComponent(catId)}`;
     });

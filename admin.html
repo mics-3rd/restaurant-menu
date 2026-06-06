@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>管理画面 - みっくん食堂</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .admin-header { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; background: #2d7a6b; color: #f0f5f0; }
+    .admin-header h1 { margin: 0; font-size: 1.2rem; }
+    .logout-btn { background: transparent; border: 1px solid #f0f5f0; color: #f0f5f0; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+    .logout-btn:hover { background: rgba(255,255,255,0.15); }
+
+    .token-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 1rem; padding: 2rem; }
+    .token-screen h2 { color: #2d7a6b; margin: 0; }
+    .token-screen p { color: #4a6b63; font-size: 0.9rem; margin: 0; text-align: center; }
+    .token-input-wrap { display: flex; gap: 0.5rem; width: 100%; max-width: 420px; }
+    .token-input-wrap input { flex: 1; padding: 0.6rem; border: 1px solid #a8cac5; border-radius: 6px; font-size: 1rem; }
+
+    .btn-primary { background: #2d7a6b; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 600; }
+    .btn-primary:hover { background: #25615a; }
+    .btn-primary:disabled { background: #a8cac5; cursor: not-allowed; }
+    .btn-secondary { background: #e8f4f0; color: #2d7a6b; border: 1px solid #a8cac5; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .btn-secondary:hover { background: #d4ece7; }
+    .btn-danger { background: #c0392b; color: #fff; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .btn-danger:hover { background: #a93226; }
+
+    .toolbar { display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem; flex-wrap: wrap; }
+    .filter-btns { display: flex; gap: 0.4rem; flex-wrap: wrap; flex: 1; }
+    .filter-btn { background: #e8f4f0; color: #1a3a34; border: 1px solid #a8cac5; padding: 0.3rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .filter-btn.active { background: #2d7a6b; color: #fff; border-color: #2d7a6b; }
+
+    .count-badge { font-size: 0.8rem; color: #4a6b63; padding: 0 0.8rem 0.4rem; }
+
+    .admin-list { display: grid; gap: 0.6rem; padding: 0 0.8rem 2rem; }
+    .admin-card { background: #e8f4f0; border: 1px solid #a8cac5; border-radius: 10px; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; }
+    .admin-card-info { flex: 1; min-width: 0; }
+    .admin-card-name { font-weight: 700; font-size: 1rem; color: #1a3a34; }
+    .admin-card-meta { font-size: 0.8rem; color: #4a6b63; margin-top: 0.2rem; }
+    .admin-card-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; overflow-y: auto; padding: 1rem; }
+    .modal-overlay.open { display: block; }
+    .modal { background: #fff; border-radius: 14px; padding: 1.4rem; width: 100%; max-width: 500px; margin: auto; }
+    .modal h2 { margin: 0 0 1rem; font-size: 1.1rem; color: #2d7a6b; }
+    .form-group { margin-bottom: 0.9rem; }
+    .form-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem; color: #1a3a34; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.5rem; border: 1px solid #cca889; border-radius: 6px; background: #fff; box-sizing: border-box; font-size: 0.95rem; font-family: inherit; }
+    .form-group textarea { resize: vertical; min-height: 110px; }
+    .form-group small { color: #7a6758; font-size: 0.8rem; display: block; margin-top: 0.2rem; }
+    .modal-footer { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.2rem; }
+
+    .alert { font-size: 0.85rem; padding: 0.5rem 0.7rem; border-radius: 6px; margin-bottom: 0.8rem; display: none; }
+    .alert-error { background: #fde; color: #c0392b; }
+    .alert-success { background: #dfd; color: #27ae60; }
+
+    .empty-state { padding: 1rem; color: #4a6b63; text-align: center; }
+  </style>
+</head>
+<body>
+
+<!-- Token入力画面 -->
+<div id="tokenScreen" class="token-screen">
+  <h2>みっくん食堂 管理画面</h2>
+  <p>GitHub Personal Access Token を入力してください<br>（repo スコープが必要です）</p>
+  <div class="token-input-wrap">
+    <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx" />
+    <button class="btn-primary" id="connectBtn" onclick="connect()">接続</button>
+  </div>
+  <div id="tokenError" class="alert alert-error" style="max-width:420px;"></div>
+</div>
+
+<!-- 管理画面 -->
+<div id="adminScreen" style="display:none">
+  <header class="admin-header">
+    <h1>みっくん食堂 管理画面</h1>
+    <button class="logout-btn" onclick="logout()">ログアウト</button>
+  </header>
+
+  <div class="toolbar">
+    <div class="filter-btns" id="filterBtns"></div>
+    <button class="btn-primary" onclick="openForm(null)">＋ メニュー追加</button>
+  </div>
+  <div id="countBadge" class="count-badge"></div>
+  <div id="adminList" class="admin-list"></div>
+</div>
+
+<!-- 追加・編集モーダル -->
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal">
+    <h2 id="modalTitle">メニュー追加</h2>
+    <div id="modalError" class="alert alert-error"></div>
+    <div class="form-group">
+      <label>カテゴリ</label>
+      <select id="fCategory"></select>
+    </div>
+    <div class="form-group">
+      <label>メニュー名</label>
+      <input type="text" id="fName" placeholder="例：唐揚げ" />
+    </div>
+    <div class="form-group">
+      <label>説明</label>
+      <input type="text" id="fDescription" placeholder="例：カリッとジューシーに仕上げるコツあり" />
+    </div>
+    <div class="form-group">
+      <label>分量</label>
+      <input type="text" id="fServing" placeholder="例：2人分" />
+    </div>
+    <div class="form-group">
+      <label>材料</label>
+      <textarea id="fIngredients" placeholder="鶏もも肉 300g&#10;醤油 大さじ1&#10;片栗粉 適量"></textarea>
+      <small>1行1項目で入力</small>
+    </div>
+    <div class="form-group">
+      <label>作り方</label>
+      <textarea id="fRecipe" placeholder="鶏肉を一口大に切る&#10;下味をつける&#10;揚げる"></textarea>
+      <small>1行1手順で入力</small>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeForm()">キャンセル</button>
+      <button class="btn-primary" id="saveBtn" onclick="submitForm()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const REPO = "mics-3rd/restaurant-menu";
+const API_URL = `https://api.github.com/repos/${REPO}/contents/data/menus.json`;
+
+let currentData = null;
+let currentSha = null;
+let editingId = null;
+let activeFilter = "all";
+
+// --- Token ---
+const getToken = () => sessionStorage.getItem("admin_token");
+const setToken = t => sessionStorage.setItem("admin_token", t);
+
+function logout() {
+  sessionStorage.removeItem("admin_token");
+  currentData = null; currentSha = null;
+  document.getElementById("adminScreen").style.display = "none";
+  document.getElementById("tokenScreen").style.display = "flex";
+  document.getElementById("tokenInput").value = "";
+}
+
+// --- GitHub API ---
+async function apiGet(token) {
+  const res = await fetch(API_URL, {
+    headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" }
+  });
+  if (!res.ok) throw new Error(`認証失敗 (${res.status})`);
+  const json = await res.json();
+  currentSha = json.sha;
+  return JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\n/g, "")))));
+}
+
+async function apiPut(token, data, message) {
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  const res = await fetch(API_URL, {
+    method: "PUT",
+    headers: {
+      Authorization: `token ${token}`,
+      Accept: "application/vnd.github.v3+json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message, content, sha: currentSha })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `エラー (${res.status})`);
+  }
+  const result = await res.json();
+  currentSha = result.content.sha;
+}
+
+// --- Connect / Init ---
+async function connect() {
+  const token = document.getElementById("tokenInput").value.trim();
+  if (!token) return;
+  const errEl = document.getElementById("tokenError");
+  const btn = document.getElementById("connectBtn");
+  errEl.style.display = "none";
+  btn.disabled = true; btn.textContent = "接続中...";
+  try {
+    currentData = await apiGet(token);
+    setToken(token);
+    showAdminScreen();
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.style.display = "block";
+  } finally {
+    btn.disabled = false; btn.textContent = "接続";
+  }
+}
+
+async function init() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    currentData = await apiGet(token);
+    showAdminScreen();
+  } catch {
+    logout();
+  }
+}
+
+function showAdminScreen() {
+  document.getElementById("tokenScreen").style.display = "none";
+  document.getElementById("adminScreen").style.display = "block";
+  renderFilterBtns();
+  renderList();
+}
+
+// --- Render ---
+function catMap() {
+  return Object.fromEntries((currentData.categories || []).map(c => [c.id, c.name]));
+}
+
+function renderFilterBtns() {
+  const wrap = document.getElementById("filterBtns");
+  wrap.innerHTML = "";
+  [{ id: "all", name: "すべて" }, ...(currentData.categories || [])].forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "filter-btn" + (c.id === activeFilter ? " active" : "");
+    btn.textContent = c.name;
+    btn.onclick = () => { activeFilter = c.id; renderFilterBtns(); renderList(); };
+    wrap.appendChild(btn);
+  });
+}
+
+function renderList() {
+  const list = document.getElementById("adminList");
+  const map = catMap();
+  const menus = (currentData.menus || []).filter(m => activeFilter === "all" || m.category === activeFilter);
+  document.getElementById("countBadge").textContent = `${menus.length} 件`;
+  list.innerHTML = "";
+
+  if (!menus.length) {
+    list.innerHTML = '<p class="empty-state">メニューがありません</p>';
+    return;
+  }
+
+  menus.forEach(menu => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const info = document.createElement("div");
+    info.className = "admin-card-info";
+    const name = document.createElement("div");
+    name.className = "admin-card-name";
+    name.textContent = menu.name;
+    const meta = document.createElement("div");
+    meta.className = "admin-card-meta";
+    meta.textContent = [map[menu.category] || menu.category, menu.serving].filter(Boolean).join("　");
+    info.appendChild(name);
+    info.appendChild(meta);
+
+    const actions = document.createElement("div");
+    actions.className = "admin-card-actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn-secondary";
+    editBtn.textContent = "編集";
+    editBtn.onclick = () => openForm(menu);
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn-danger";
+    delBtn.textContent = "削除";
+    delBtn.onclick = () => deleteMenu(menu.id, menu.name);
+
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    card.appendChild(info);
+    card.appendChild(actions);
+    list.appendChild(card);
+  });
+}
+
+// --- Form ---
+function openForm(menu) {
+  editingId = menu ? menu.id : null;
+  document.getElementById("modalTitle").textContent = menu ? "メニュー編集" : "メニュー追加";
+  document.getElementById("modalError").style.display = "none";
+
+  const sel = document.getElementById("fCategory");
+  sel.innerHTML = "";
+  (currentData.categories || []).forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.id;
+    opt.textContent = c.name;
+    if (menu && c.id === menu.category) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  document.getElementById("fName").value = menu?.name ?? "";
+  document.getElementById("fDescription").value = menu?.description ?? "";
+  document.getElementById("fServing").value = menu?.serving ?? "";
+  document.getElementById("fIngredients").value = (menu?.ingredients ?? []).join("\n");
+  document.getElementById("fRecipe").value = (menu?.recipe ?? []).join("\n");
+
+  document.getElementById("modalOverlay").classList.add("open");
+  document.getElementById("fName").focus();
+}
+
+function closeForm() {
+  document.getElementById("modalOverlay").classList.remove("open");
+  editingId = null;
+}
+
+async function submitForm() {
+  const errEl = document.getElementById("modalError");
+  const saveBtn = document.getElementById("saveBtn");
+  errEl.style.display = "none";
+
+  const name = document.getElementById("fName").value.trim();
+  const category = document.getElementById("fCategory").value;
+  if (!name) { errEl.textContent = "メニュー名を入力してください"; errEl.style.display = "block"; return; }
+
+  const menu = {
+    id: editingId || `menu-${Date.now()}`,
+    name,
+    category,
+    description: document.getElementById("fDescription").value.trim(),
+    serving: document.getElementById("fServing").value.trim(),
+    ingredients: document.getElementById("fIngredients").value.split("\n").map(l => l.trim()).filter(Boolean),
+    recipe: document.getElementById("fRecipe").value.split("\n").map(l => l.trim()).filter(Boolean)
+  };
+
+  const data = {
+    ...currentData,
+    menus: editingId
+      ? currentData.menus.map(m => m.id === editingId ? menu : m)
+      : [...(currentData.menus || []), menu]
+  };
+
+  saveBtn.disabled = true; saveBtn.textContent = "保存中...";
+  try {
+    await apiPut(getToken(), data, `${editingId ? "Update" : "Add"} menu: ${name}`);
+    currentData = data;
+    closeForm();
+    renderList();
+  } catch (e) {
+    errEl.textContent = `保存失敗: ${e.message}`;
+    errEl.style.display = "block";
+  } finally {
+    saveBtn.disabled = false; saveBtn.textContent = "保存";
+  }
+}
+
+async function deleteMenu(id, name) {
+  if (!confirm(`「${name}」を削除しますか？`)) return;
+  const data = { ...currentData, menus: currentData.menus.filter(m => m.id !== id) };
+  try {
+    await apiPut(getToken(), data, `Delete menu: ${name}`);
+    currentData = data;
+    renderList();
+  } catch (e) {
+    alert(`削除失敗: ${e.message}`);
+  }
+}
+
+document.getElementById("tokenInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") connect();
+});
+
+document.getElementById("modalOverlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("modalOverlay")) closeForm();
+});
+
+init();
+</script>
+</body>
+</html>

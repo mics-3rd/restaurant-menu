@@ -25,8 +25,7 @@ function getQuery(name) { return new URLSearchParams(location.search).get(name);
 
 async function fetchMenus() {
   const json = await fetch("data/menus.json").then(r => r.json());
-  const custom = JSON.parse(localStorage.getItem("customMenus") || "[]");
-  return [...(json.menus || []), ...custom];
+  return json.menus || [];
 }
 
 async function loadRecipe() {
