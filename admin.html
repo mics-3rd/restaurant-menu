@@ -56,6 +56,11 @@
     .alert-success { background: #dfd; color: #27ae60; }
 
     .empty-state { padding: 1rem; color: #4a6b63; text-align: center; }
+
+    .tab-bar { display: flex; border-bottom: 2px solid #a8cac5; background: #fff; }
+    .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; padding: 0.7rem 1.4rem; font-size: 1rem; font-weight: 600; cursor: pointer; color: #4a6b63; }
+    .tab-btn.active { color: #2d7a6b; border-bottom-color: #2d7a6b; }
+    .tab-btn:hover { background: #e8f4f0; }
   </style>
 </head>
 <body>
@@ -78,12 +83,29 @@
     <button class="logout-btn" onclick="logout()">ログアウト</button>
   </header>
 
-  <div class="toolbar">
-    <div class="filter-btns" id="filterBtns"></div>
-    <button class="btn-primary" onclick="openForm(null)">＋ メニュー追加</button>
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="menus" onclick="switchTab('menus')">メニュー</button>
+    <button class="tab-btn" data-tab="categories" onclick="switchTab('categories')">カテゴリ</button>
   </div>
-  <div id="countBadge" class="count-badge"></div>
-  <div id="adminList" class="admin-list"></div>
+
+  <!-- メニュー管理 -->
+  <div id="menuSection">
+    <div class="toolbar">
+      <div class="filter-btns" id="filterBtns"></div>
+      <button class="btn-primary" onclick="openForm(null)">＋ メニュー追加</button>
+    </div>
+    <div id="countBadge" class="count-badge"></div>
+    <div id="adminList" class="admin-list"></div>
+  </div>
+
+  <!-- カテゴリ管理 -->
+  <div id="categorySection" style="display:none">
+    <div class="toolbar">
+      <button class="btn-primary" onclick="openCatForm(null)">＋ カテゴリ追加</button>
+    </div>
+    <div id="catCountBadge" class="count-badge"></div>
+    <div id="catList" class="admin-list"></div>
+  </div>
 </div>
 
 <!-- 追加・編集モーダル -->
@@ -124,6 +146,22 @@
   </div>
 </div>
 
+<!-- カテゴリ追加・編集モーダル -->
+<div id="catModalOverlay" class="modal-overlay">
+  <div class="modal">
+    <h2 id="catModalTitle">カテゴリ追加</h2>
+    <div id="catModalError" class="alert alert-error"></div>
+    <div class="form-group">
+      <label>カテゴリ名</label>
+      <input type="text" id="fCatName" placeholder="例：揚げ物" />
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeCatForm()">キャンセル</button>
+      <button class="btn-primary" id="catSaveBtn" onclick="submitCatForm()">保存</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const REPO = "mics-3rd/restaurant-menu";
 const API_URL = `https://api.github.com/repos/${REPO}/contents/data/menus.json`;
@@ -131,7 +169,9 @@ const API_URL = `https://api.github.com/repos/${REPO}/contents/data/menus.json`;
 let currentData = null;
 let currentSha = null;
 let editingId = null;
+let editingCatId = null;
 let activeFilter = "all";
+let activeTab = "menus";
 
 // --- Token ---
 const getToken = () => sessionStorage.getItem("admin_token");
@@ -211,6 +251,15 @@ function showAdminScreen() {
   document.getElementById("adminScreen").style.display = "block";
   renderFilterBtns();
   renderList();
+}
+
+// --- Tabs ---
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById("menuSection").style.display = tab === "menus" ? "block" : "none";
+  document.getElementById("categorySection").style.display = tab === "categories" ? "block" : "none";
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  if (tab === "categories") renderCatList();
 }
 
 // --- Render ---
@@ -349,6 +398,117 @@ async function submitForm() {
   }
 }
 
+// --- Category CRUD ---
+function renderCatList() {
+  const list = document.getElementById("catList");
+  const categories = currentData.categories || [];
+  document.getElementById("catCountBadge").textContent = `${categories.length} 件`;
+  list.innerHTML = "";
+
+  if (!categories.length) {
+    list.innerHTML = '<p class="empty-state">カテゴリがありません</p>';
+    return;
+  }
+
+  categories.forEach(cat => {
+    const menuCount = (currentData.menus || []).filter(m => m.category === cat.id).length;
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const info = document.createElement("div");
+    info.className = "admin-card-info";
+    const name = document.createElement("div");
+    name.className = "admin-card-name";
+    name.textContent = cat.name;
+    const meta = document.createElement("div");
+    meta.className = "admin-card-meta";
+    meta.textContent = `ID: ${cat.id}　メニュー ${menuCount} 件`;
+    info.appendChild(name);
+    info.appendChild(meta);
+
+    const actions = document.createElement("div");
+    actions.className = "admin-card-actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn-secondary";
+    editBtn.textContent = "編集";
+    editBtn.onclick = () => openCatForm(cat);
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn-danger";
+    delBtn.textContent = "削除";
+    delBtn.onclick = () => deleteCat(cat.id, cat.name, menuCount);
+
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    card.appendChild(info);
+    card.appendChild(actions);
+    list.appendChild(card);
+  });
+}
+
+function openCatForm(cat) {
+  editingCatId = cat ? cat.id : null;
+  document.getElementById("catModalTitle").textContent = cat ? "カテゴリ編集" : "カテゴリ追加";
+  document.getElementById("catModalError").style.display = "none";
+  document.getElementById("fCatName").value = cat?.name ?? "";
+  document.getElementById("catModalOverlay").classList.add("open");
+  document.getElementById("fCatName").focus();
+}
+
+function closeCatForm() {
+  document.getElementById("catModalOverlay").classList.remove("open");
+  editingCatId = null;
+}
+
+async function submitCatForm() {
+  const errEl = document.getElementById("catModalError");
+  const saveBtn = document.getElementById("catSaveBtn");
+  errEl.style.display = "none";
+
+  const name = document.getElementById("fCatName").value.trim();
+  if (!name) { errEl.textContent = "カテゴリ名を入力してください"; errEl.style.display = "block"; return; }
+
+  let categories;
+  if (editingCatId) {
+    categories = currentData.categories.map(c => c.id === editingCatId ? { ...c, name } : c);
+  } else {
+    categories = [...(currentData.categories || []), { id: `cat-${Date.now()}`, name }];
+  }
+
+  const data = { ...currentData, categories };
+  saveBtn.disabled = true; saveBtn.textContent = "保存中...";
+  try {
+    await apiPut(getToken(), data, `${editingCatId ? "Update" : "Add"} category: ${name}`);
+    currentData = data;
+    closeCatForm();
+    renderCatList();
+    renderFilterBtns();
+  } catch (e) {
+    errEl.textContent = `保存失敗: ${e.message}`;
+    errEl.style.display = "block";
+  } finally {
+    saveBtn.disabled = false; saveBtn.textContent = "保存";
+  }
+}
+
+async function deleteCat(id, name, menuCount) {
+  if (menuCount > 0) {
+    alert(`「${name}」には ${menuCount} 件のメニューがあります。\n先にメニューを削除または別カテゴリへ移動してください。`);
+    return;
+  }
+  if (!confirm(`「${name}」を削除しますか？`)) return;
+  const data = { ...currentData, categories: currentData.categories.filter(c => c.id !== id) };
+  try {
+    await apiPut(getToken(), data, `Delete category: ${name}`);
+    currentData = data;
+    renderCatList();
+    renderFilterBtns();
+  } catch (e) {
+    alert(`削除失敗: ${e.message}`);
+  }
+}
+
 async function deleteMenu(id, name) {
   if (!confirm(`「${name}」を削除しますか？`)) return;
   const data = { ...currentData, menus: currentData.menus.filter(m => m.id !== id) };
@@ -367,6 +527,14 @@ document.getElementById("tokenInput").addEventListener("keydown", e => {
 
 document.getElementById("modalOverlay").addEventListener("click", e => {
   if (e.target === document.getElementById("modalOverlay")) closeForm();
+});
+
+document.getElementById("catModalOverlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("catModalOverlay")) closeCatForm();
+});
+
+document.getElementById("fCatName").addEventListener("keydown", e => {
+  if (e.key === "Enter") submitCatForm();
 });
 
 init();
