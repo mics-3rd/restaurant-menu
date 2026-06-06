@@ -156,16 +156,15 @@ async function loadRecipe() {
   const recipeSteps = (menu.recipe || []).map(s => `<li>${escHtml(s)}</li>`).join("") || "<li>手順が登録されていません</li>";
 
   content.innerHTML = `
+    <p id="recipeDesc" class="recipe-lead"></p>
     <section class="box">
-      <h2>説明</h2>
-      <p class="menu-card-description" id="recipeDesc"></p>
-    </section>
-    <section class="box">
-      <h2>材料</h2>
-      <div class="serving-control">
-        <button class="serve-btn" type="button" id="serveDown">－</button>
-        <span id="servingDisplay">${escHtml(servingLabel(currentServing))}</span>
-        <button class="serve-btn" type="button" id="serveUp">＋</button>
+      <div class="ingredients-header">
+        <h2>材料</h2>
+        <div class="serving-control">
+          <button class="serve-btn" type="button" id="serveDown">－</button>
+          <span id="servingDisplay">${escHtml(servingLabel(currentServing))}</span>
+          <button class="serve-btn" type="button" id="serveUp">＋</button>
+        </div>
       </div>
       <div class="ingredient-list" id="ingredientList"></div>
     </section>
